@@ -24,8 +24,7 @@ class CategoriaSeeder extends Seeder
             'Legumbres, Arroz y Pasta',
             'Panadería y Dulces',
             'Congelados y Platos Listos',
-            'Bebidas',
-            'Despensa y Condimentos'
+            'Otros'
         ];
 
         foreach ($categorias as $nombre) {

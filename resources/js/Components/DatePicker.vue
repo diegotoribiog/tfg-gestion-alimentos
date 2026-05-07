@@ -184,11 +184,11 @@ onUnmounted(() => {
     <div class="w-full relative" ref="inputContainerRef">
         <!-- Input con Máscara y Guía Visual -->
         <div 
-            class="w-full h-[44px] bg-slate-50 dark:bg-slate-800 rounded-2xl px-4 flex items-center justify-between border-none focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all shadow-sm group"
+            class="w-full h-[44px] bg-slate-50 dark:bg-midnight/50 rounded-2xl px-4 flex items-center justify-between border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-emerald-vibrant/20 transition-all shadow-sm group"
         >
             <div class="relative flex-1 h-full flex items-center">
                 <!-- Capa de Guía (DD/MM/YYYY) -->
-                <span class="absolute inset-0 flex items-center text-sm font-bold text-slate-300 dark:text-slate-600 pointer-events-none select-none">
+                <span class="absolute inset-0 flex items-center text-[10px] font-black uppercase tracking-widest text-slate-300 dark:text-slate-700 pointer-events-none select-none">
                     {{ guideValue }}
                 </span>
                 <!-- Input Real -->
@@ -198,108 +198,117 @@ onUnmounted(() => {
                     :value="inputValue"
                     @input="handleInput"
                     maxlength="10"
-                    class="absolute inset-0 bg-transparent border-none p-0 focus:ring-0 text-sm font-bold w-full text-slate-900 dark:text-slate-100 z-10"
+                    class="absolute inset-0 bg-transparent border-none p-0 focus:ring-0 text-[10px] font-black uppercase tracking-widest w-full text-slate-900 dark:text-slate-300 z-10"
                 />
             </div>
             
             <button 
                 type="button"
                 @click.stop="isOpen = !isOpen"
-                class="relative z-20 shrink-0 ml-2 p-1 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
+                class="relative z-20 shrink-0 ml-2 p-1 hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 rounded-lg transition-colors"
             >
-                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-emerald-vibrant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
             </button>
         </div>
 
-        <!-- Calendario Popover Anclado (Absolute) -->
-        <div 
-            v-if="isOpen"
-            ref="calendarRef"
-            class="absolute z-[999] w-[320px] bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-8 animate-in fade-in zoom-in duration-200"
-        >
-            <!-- CABECERA NAVEGACIÓN -->
-            <div class="flex items-center justify-between mb-8">
-                <button @click="changeMonth(-1)" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl text-slate-400 transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                
-                <div class="flex gap-2">
-                    <button @click="view = 'months'" class="text-sm font-black uppercase tracking-widest text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 px-3 py-1 rounded-xl transition-all">
-                        {{ config.months[viewDate.getMonth()] }}
+        <!-- Calendario Popover Anclado (Teleportado a body) -->
+        <Teleport to="body">
+            <div 
+                v-if="isOpen"
+                ref="calendarRef"
+                class="absolute z-[9999] w-[320px] bg-white dark:bg-midnight-card rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-8 animate-in fade-in zoom-in duration-200"
+            >
+                <!-- CABECERA NAVEGACIÓN -->
+                <div class="flex items-center justify-between mb-8">
+                    <button @click="changeMonth(-1)" class="p-3 hover:bg-slate-50 dark:hover:bg-midnight rounded-2xl text-slate-400 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button @click="view = 'years'" class="text-sm font-black text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1 rounded-xl transition-all">
-                        {{ viewDate.getFullYear() }}
+                    
+                    <div class="flex gap-2">
+                        <button @click="view = 'months'" class="text-[10px] font-black uppercase tracking-widest text-emerald-vibrant hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 px-3 py-1 rounded-xl transition-all">
+                            {{ config.months[viewDate.getMonth()] }}
+                        </button>
+                        <button @click="view = 'years'" class="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-midnight px-3 py-1 rounded-xl transition-all">
+                            {{ viewDate.getFullYear() }}
+                        </button>
+                    </div>
+
+                    <button @click="changeMonth(1)" class="p-3 hover:bg-slate-50 dark:hover:bg-midnight rounded-2xl text-slate-400 transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
 
-                <button @click="changeMonth(1)" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl text-slate-400 transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-                </button>
-            </div>
-
-            <!-- VISTA DÍAS -->
-            <div v-if="view === 'days'">
-                <div class="grid grid-cols-7 gap-1 mb-4">
-                    <div v-for="d in config.weekDays" :key="d" class="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase text-center py-2">{{ d }}</div>
+                <!-- VISTA DÍAS -->
+                <div v-if="view === 'days'">
+                    <div class="grid grid-cols-7 gap-1 mb-4">
+                        <div v-for="d in config.weekDays" :key="d" class="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase text-center py-2">{{ d }}</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2">
+                        <button 
+                            v-for="(d, i) in days" :key="i"
+                            @click="selectDate(d)"
+                            :class="[
+                                !d.current ? 'text-slate-200 dark:text-slate-700' : 'text-slate-600 dark:text-slate-300',
+                                props.modelValue === `${d.year}-${String(d.month + 1).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` 
+                                    ? 'bg-emerald-vibrant text-white shadow-xl shadow-emerald-500/20 dark:shadow-none font-bold scale-110' 
+                                    : 'hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10'
+                            ]"
+                            class="h-10 w-10 rounded-2xl text-[10px] font-black flex flex-col items-center justify-center transition-all relative"
+                        >
+                            <span>{{ d.day }}</span>
+                            <!-- Punto indicador para el día de hoy -->
+                            <span 
+                                v-if="d.day === new Date().getDate() && d.month === new Date().getMonth() && d.year === new Date().getFullYear()"
+                                class="absolute bottom-1.5 w-1 h-1 rounded-full"
+                                :class="props.modelValue === `${d.year}-${String(d.month + 1).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` ? 'bg-white' : 'bg-emerald-vibrant'"
+                            ></span>
+                        </button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-7 gap-2">
+
+                <!-- VISTA MESES -->
+                <div v-if="view === 'months'" class="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-2 duration-300">
                     <button 
-                        v-for="(d, i) in days" :key="i"
-                        @click="selectDate(d)"
-                        :class="[
-                            !d.current ? 'text-slate-200 dark:text-slate-700' : 'text-slate-600 dark:text-slate-300',
-                            props.modelValue === `${d.year}-${String(d.month + 1).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` 
-                                ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-200 dark:shadow-none font-bold scale-110' 
-                                : 'hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-                        ]"
-                        class="h-10 w-10 rounded-2xl text-xs flex items-center justify-center transition-all"
+                        v-for="(m, i) in config.months" :key="m"
+                        @click="selectMonth(i)"
+                        class="py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 hover:text-emerald-vibrant transition-all"
+                        :class="{ 'bg-emerald-vibrant text-white shadow-lg': viewDate.getMonth() === i }"
                     >
-                        {{ d.day }}
+                        {{ m.substring(0, 3) }}
+                    </button>
+                </div>
+
+                <!-- VISTA AÑOS -->
+                <div v-if="view === 'years'" class="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-2 duration-300">
+                    <button 
+                        v-for="y in years" :key="y"
+                        @click="selectYear(y)"
+                        class="py-4 rounded-2xl text-[10px] font-black text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 hover:text-emerald-vibrant transition-all"
+                        :class="{ 'bg-emerald-vibrant text-white shadow-lg': viewDate.getFullYear() === y }"
+                    >
+                        {{ y }}
+                    </button>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="mt-8 pt-6 border-t border-slate-50 dark:border-slate-800 flex justify-center">
+                    <button 
+                        @click="selectDate({ day: new Date().getDate(), month: new Date().getMonth(), year: new Date().getFullYear() })"
+                        class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 hover:text-emerald-vibrant transition-all"
+                    >
+                        Hoy
                     </button>
                 </div>
             </div>
-
-            <!-- VISTA MESES -->
-            <div v-if="view === 'months'" class="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-2 duration-300">
-                <button 
-                    v-for="(m, i) in config.months" :key="m"
-                    @click="selectMonth(i)"
-                    class="py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 transition-all"
-                    :class="{ 'bg-emerald-500 text-white shadow-lg': viewDate.getMonth() === i }"
-                >
-                    {{ m.substring(0, 3) }}
-                </button>
-            </div>
-
-            <!-- VISTA AÑOS -->
-            <div v-if="view === 'years'" class="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-2 duration-300">
-                <button 
-                    v-for="y in years" :key="y"
-                    @click="selectYear(y)"
-                    class="py-4 rounded-2xl text-sm font-black text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 transition-all"
-                    :class="{ 'bg-emerald-500 text-white shadow-lg': viewDate.getFullYear() === y }"
-                >
-                    {{ y }}
-                </button>
-            </div>
-
-            <!-- FOOTER -->
-            <div class="mt-8 pt-6 border-t border-slate-50 dark:border-slate-800 flex justify-center">
-                <button 
-                    @click="selectDate({ day: new Date().getDate(), month: new Date().getMonth(), year: new Date().getFullYear() })"
-                    class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 hover:text-emerald-500 transition-all"
-                >
-                    Hoy
-                </button>
-            </div>
-        </div>
+        </Teleport>
     </div>
 </template>
 
 <style scoped>
-.fixed {
-    pointer-events: auto;
+/* Evitar que el input nativo muestre el calendario del sistema si se cambia el type */
+input::-webkit-calendar-picker-indicator {
+    display: none;
 }
 </style>

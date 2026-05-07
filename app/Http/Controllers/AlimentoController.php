@@ -61,7 +61,7 @@ class AlimentoController extends Controller
             'cantidad' => ['required', 'numeric'],
         ]);
 
-        $nuevaCantidad = $alimento->cantidad + $request->cantidad;
+        $nuevaCantidad = (int)$alimento->cantidad + (int)$request->cantidad;
 
         if ($nuevaCantidad <= 0) {
             $alimento->delete();

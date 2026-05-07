@@ -16,6 +16,19 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                midnight: {
+                    DEFAULT: '#0f172a',
+                    dark: '#0f172a',
+                    card: '#1e293b',
+                },
+                emerald: {
+                    vibrant: '#10b981',
+                },
+                slate: {
+                    base: '#f8fafc',
+                }
+            },
         },
     },
 

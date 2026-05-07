@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\RecetaController;
+
 // Redirigimos la raíz al inicio
 Route::get('/', function () {
     return redirect()->route('inicio');
@@ -16,6 +18,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Inicio (Dashboard)
     Route::get('/inicio', [DashboardController::class, 'index'])->name('inicio');
+
+    // Recetas con IA y Gestión de Historial
+    Route::controller(RecetaController::class)->group(function () {
+        Route::get('/mis-recetas', 'index')->name('recetas.index');
+        Route::post('/receta-rapida', 'generar')->name('recetas.ia');
+        Route::post('/recetas/cocinar', 'cocinarReceta')->name('recetas.cocinar');
+        Route::post('/recetas/{id}/favorito', 'toggleFavorite')->name('recetas.favorito');
+        Route::delete('/recetas/{id}', 'destroy')->name('recetas.destroy');
+    });
 
     // Gestión de Perfil
     Route::controller(ProfileController::class)->group(function () {
