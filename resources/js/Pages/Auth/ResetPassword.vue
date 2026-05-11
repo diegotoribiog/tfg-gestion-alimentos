@@ -1,18 +1,15 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/vue3';
-// Importamos los componentes esenciales para mantener la lógica de Breeze
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 
-// Props que Laravel envía automáticamente a través del enlace de recuperación
 const props = defineProps({
     email: String,
     token: String,
 });
 
-// Inicialización del formulario con los datos necesarios para resetear la clave
 const form = useForm({
     token: props.token,
     email: props.email,
@@ -20,7 +17,6 @@ const form = useForm({
     password_confirmation: '',
 });
 
-// Función de envío: Laravel procesará el token y actualizará la contraseña en la BD
 const submit = () => {
     form.post(route('password.store'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
@@ -36,17 +32,16 @@ const submit = () => {
         <div class="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
             <img 
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                alt="Despensa organizada" 
+                alt="Nueva Etapa" 
                 class="absolute inset-0 w-full h-full object-cover opacity-30"
             />
             
             <div class="relative z-10 flex flex-col items-center text-center px-12 text-white">
                 <h1 class="text-7xl font-extrabold tracking-tighter mb-6">
-                    Nueva<br/><span class="text-emerald-400">Clave</span>
+                    Nueva<br/><span class="text-emerald-400">Etapa</span>
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed">
-                    Estás a un paso de recuperar el acceso total a tu inventario.
-                    Crea una contraseña segura que no olvides esta vez.
+                    Establece tu nueva contraseña y vuelve a tener el control total de tu inventario en midespensa.
                 </p>
             </div>
         </div>
@@ -55,13 +50,13 @@ const submit = () => {
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Mi<span class="text-emerald-500">Despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-10 text-center lg:text-left">
-                    <h2 class="text-3xl font-bold text-gray-900">Restablecer contraseña</h2>
-                    <p class="text-gray-500 mt-2 font-medium italic">
-                        Por favor, introduce tu nueva clave de acceso.
+                    <h2 class="text-3xl font-bold text-gray-900">Nueva contraseña</h2>
+                    <p class="text-gray-500 mt-2 font-medium">
+                        Crea una clave segura para proteger tus datos de inventario.
                     </p>
                 </div>
 
@@ -71,7 +66,7 @@ const submit = () => {
                         <TextInput
                             id="email"
                             type="email"
-                            class="mt-1 block w-full bg-gray-100 border-gray-200 rounded-xl py-3 text-gray-500 cursor-not-allowed"
+                            class="mt-1 block w-full bg-gray-100 border-gray-200 rounded-xl py-3 text-gray-500 cursor-not-allowed shadow-none"
                             v-model="form.email"
                             required
                             readonly
@@ -84,7 +79,7 @@ const submit = () => {
                         <TextInput
                             id="password"
                             type="password"
-                            class="mt-1 block w-full bg-white border-gray-200 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                            class="mt-1 block w-full py-3 shadow-sm"
                             v-model="form.password"
                             required
                             autofocus
@@ -99,7 +94,7 @@ const submit = () => {
                         <TextInput
                             id="password_confirmation"
                             type="password"
-                            class="mt-1 block w-full bg-white border-gray-200 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                            class="mt-1 block w-full"
                             v-model="form.password_confirmation"
                             required
                             autocomplete="new-password"
@@ -120,7 +115,7 @@ const submit = () => {
                 </form>
 
                 <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
-                    © 2026 MiDespensa · Seguridad de Cuentas
+                    © 2026 midespensa · Acceso Seguro
                 </div>
             </div>
         </div>

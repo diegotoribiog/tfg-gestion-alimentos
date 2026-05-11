@@ -47,6 +47,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
-    }
+        $user->update(['primera_vez' => false]);
+
+        return redirect(route('ayuda.como-funciona', absolute: false));
+        }
 }

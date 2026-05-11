@@ -66,40 +66,11 @@ onMounted(() => {
                                 :href="route('inicio')"
                                 class="flex items-center gap-2 group"
                             >
-                                <div
-                                    class="bg-emerald-vibrant p-2 rounded-xl group-hover:scale-110 transition-all shadow-lg shadow-emerald-500/20 dark:shadow-none"
-                                >
-                                    <svg
-                                        class="w-5 h-5 text-white"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                                        />
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M9 2l3 7 3-7"
-                                        />
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M12 9v12M3 15h18"
-                                        />
-                                    </svg>
-                                </div>
                                 <span
-                                    class="text-xl font-black tracking-tighter text-slate-900 dark:text-white hidden md:block uppercase"
+                                    class="text-xl font-black tracking-tighter text-slate-900 dark:text-white hidden md:block"
                                 >
-                                    Mi<span class="text-emerald-vibrant"
-                                        >Despensa</span
+                                    mi<span class="text-emerald-vibrant"
+                                        >despensa</span
                                     >
                                 </span>
                             </Link>
@@ -129,7 +100,15 @@ onMounted(() => {
                                 :active="route().current('recetas.index')"
                                 class="text-sm font-black uppercase tracking-widest active:text-emerald-vibrant"
                             >
-                                Mis Recetas
+                                Recetas
+                            </NavLink>
+
+                            <NavLink
+                                :href="route('ayuda.como-funciona')"
+                                :active="route().current('ayuda.como-funciona')"
+                                class="text-sm font-black uppercase tracking-widest active:text-emerald-vibrant"
+                            >
+                                Ayuda
                             </NavLink>
                         </div>
                     </div>

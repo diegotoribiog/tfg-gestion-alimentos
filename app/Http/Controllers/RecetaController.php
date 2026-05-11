@@ -28,11 +28,17 @@ class RecetaController extends Controller
     {
         $userId = Auth::id();
         $hoy = Carbon::now();
-        $alimentoId = $request->input('alimento_id');
+        $alimentosIds = $request->input('alimentos_ids', []); // Array de IDs
+        $alimentoIdUnico = $request->input('alimento_id'); // Mantener compatibilidad
+
+        // Combinar IDs si vienen ambos
+        if ($alimentoIdUnico) {
+            $alimentosIds[] = $alimentoIdUnico;
+        }
+        $alimentosIds = array_unique($alimentosIds);
 
         try {
             // 1. Obtener alimentos con STOCK REAL (>0)
-            // Incluimos los que están a punto de caducar o recién caducados para que el usuario pueda "salvarlos"
             $queryAlimentos = Alimento::where('usuario_id', $userId)
                 ->where('cantidad', '>', 0)
                 ->with('categoria')
@@ -45,48 +51,62 @@ class RecetaController extends Controller
                 ], 400);
             }
 
-            // 2. Selección de Ingrediente Principal y Acompañantes
-            $ingredienteMandatorio = null;
-            if ($alimentoId) {
-                $ingredienteMandatorio = $queryAlimentos->firstWhere('id', $alimentoId);
+            // 2. Selección de Ingredientes Mandatorios
+            $ingredientesMandatorios = collect();
+            
+            // Si el usuario seleccionó manualmente desde inventario, permitimos caducados si así lo desea
+            if (!empty($alimentosIds)) {
+                $ingredientesMandatorios = $queryAlimentos->whereIn('id', $alimentosIds);
+            } else {
+                // GENERACIÓN RÁPIDA: Filtrar estrictamente para excluir caducados
+                $queryAlimentos = $queryAlimentos->filter(function($a) use ($hoy) {
+                    return Carbon::parse($a->fecha_caducidad)->startOfDay()->gte($hoy->startOfDay());
+                });
+
+                if ($queryAlimentos->isEmpty()) {
+                    return response()->json([
+                        'error' => 'No tienes alimentos vigentes (no caducados) para una receta rápida. Por favor, selecciona ingredientes manualmente desde el inventario.'
+                    ], 400);
+                }
             }
 
             // Categorías de proteína pesada
             $proteinasCategorias = ['Carnes y Embutidos', 'Pescados y Mariscos'];
 
-            // Si no hay mandatorio, buscamos la proteína que caduca antes (que no haya caducado ya por mucho)
-            if (!$ingredienteMandatorio) {
-                $ingredienteMandatorio = $queryAlimentos->where('fecha_caducidad', '>=', $hoy->toDateString())
-                    ->first(function($a) use ($proteinasCategorias) {
+            // Si no hay mandatorios, buscamos la proteína que caduca antes (ya filtrado por no caducados arriba)
+            if ($ingredientesMandatorios->isEmpty()) {
+                $proteinaProxima = $queryAlimentos->first(function($a) use ($proteinasCategorias) {
                         return in_array($a->categoria?->nombre, $proteinasCategorias);
                     });
+                if ($proteinaProxima) {
+                    $ingredientesMandatorios->push($proteinaProxima);
+                }
             }
 
-            // Filtrado de contexto para la IA: AISLAMIENTO DE PROTEÍNA
+            // Filtrado de contexto para la IA
             $alimentosParaIA = collect();
-            if ($ingredienteMandatorio) {
-                $alimentosParaIA->push($ingredienteMandatorio);
+            if ($ingredientesMandatorios->isNotEmpty()) {
+                $alimentosParaIA = $ingredientesMandatorios->map(function($a) { return $a; });
                 
-                $esProteina = in_array($ingredienteMandatorio->categoria?->nombre, $proteinasCategorias);
+                $tieneProteina = $ingredientesMandatorios->contains(function($a) use ($proteinasCategorias) {
+                    return in_array($a->categoria?->nombre, $proteinasCategorias);
+                });
                 
-                // Si el principal es proteína, FILTRAMOS TODAS las demás proteínas pesadas del contexto
-                // para que la IA ni siquiera las vea y no pueda mezclarlas.
-                $acompanantes = $queryAlimentos->filter(function($a) use ($ingredienteMandatorio, $proteinasCategorias, $esProteina) {
-                    if ($a->id === $ingredienteMandatorio->id) return false;
+                $acompanantes = $queryAlimentos->filter(function($a) use ($ingredientesMandatorios, $proteinasCategorias, $tieneProteina) {
+                    if ($ingredientesMandatorios->pluck('id')->contains($a->id)) return false;
                     
-                    // Si ya tenemos una proteína, eliminamos cualquier otra proteína pesada
-                    if ($esProteina && in_array($a->categoria?->nombre, $proteinasCategorias)) {
+                    // Si ya tenemos proteína, evitamos más proteínas pesadas
+                    if ($tieneProteina && in_array($a->categoria?->nombre, $proteinasCategorias)) {
                         return false;
                     }
                     
                     return true;
                 })
-                ->where('fecha_caducidad', '>=', $hoy->subDays(2)->toDateString())
-                ->take(4);
+                ->take(5);
                 
                 $alimentosParaIA = $alimentosParaIA->merge($acompanantes);
             } else {
-                $alimentosParaIA = $queryAlimentos->take(5);
+                $alimentosParaIA = $queryAlimentos->take(6);
             }
 
             // Preparar lista técnica para la IA
@@ -95,11 +115,12 @@ class RecetaController extends Controller
             })->implode('; ');
 
             $apiKey = config('services.groq.api_key');
-            if (!$apiKey) return response()->json(['error' => 'Configuración de IA no encontrada.'], 500);
+            if (!$apiKey) return response()->json(['error' => 'Configuración de IA no encontrada en el servidor.'], 500);
 
-            // Ajuste del mensaje: Obligatoriedad estricta
-            $mensajeUsuario = $ingredienteMandatorio 
-                ? "DEBES incluir obligatoriamente el ingrediente [{$ingredienteMandatorio->nombre}] (ID: {$ingredienteMandatorio->id}) como base de la receta. Acompáñalo con otros ingredientes del contexto [{$contextoIngredientes}] que tengan sentido gastronómico."
+            // Ajuste del mensaje
+            $nombresMandatorios = $ingredientesMandatorios->pluck('nombre')->implode(', ');
+            $mensajeUsuario = $ingredientesMandatorios->isNotEmpty() 
+                ? "DEBES incluir obligatoriamente los ingredientes [{$nombresMandatorios}] como base de la receta. Acompáñalos con otros ingredientes del contexto [{$contextoIngredientes}]."
                 : "Usa los ingredientes del contexto [{$contextoIngredientes}] para crear una receta lógica para una persona.";
 
             $intentos = 0;
@@ -122,14 +143,15 @@ class RecetaController extends Controller
                                 'content' => "INSTRUCCIÓN CRÍTICA: {$mensajeUsuario}
                                 
                                 REGLAS DE ORO:
-                                1. EL INGREDIENTE SELECCIONADO ES MANDATORIO si se especifica.
+                                1. LOS INGREDIENTES SELECCIONADOS SON MANDATORIOS.
                                 2. CONDIMENTOS LIBRES: Tienes permiso total para usar aceite, sal, especias, vinagre y salsas básicas aunque no estén en el inventario. Inclúyelos en 'ingredientes_usados' con id: null y es_basico: true.
-                                3. Usa entre 3 y 5 ingredientes del inventario total proporcionado (además de los condimentos).
+                                3. Usa entre 3 y 6 ingredientes del inventario total proporcionado (además de los condimentos).
                                 4. No mezcles proteínas pesadas (carne/pescado).
                                 5. No mezcles sabores incompatibles.
                                 
                                 REGLAS TÉCNICAS:
                                 - Unidades: GR, ML, UD (siempre enteros).
+                                - Cantidades: NUNCA uses 0. Incluso para condimentos o básicos, pon una cantidad lógica para 1 persona (ej: 10 ML, 5 GR, 1 UD).
                                 - Ración: 1 Persona.
                                 - Si es imposible crear algo coherente, el título debe ser 'ERROR_GASTRONOMICO'.
                                 
@@ -152,39 +174,83 @@ class RecetaController extends Controller
                         'response_format' => ['type' => 'json_object']
                     ]);
 
-                if ($response->failed()) continue;
+                if ($response->failed()) {
+                    Log::error("Groq API error: " . $response->body());
+                    continue;
+                }
 
                 $data = $response->json();
-                $recetaCuerpo = json_decode($data['choices'][0]['message']['content'], true);
+                $content = $data['choices'][0]['message']['content'] ?? null;
+                if (!$content) continue;
 
-                // Si no hay ingrediente mandatorio, aceptamos la primera respuesta válida
-                if (!$alimentoId) break;
+                $recetaCuerpo = json_decode($content, true);
 
-                // Si hay ingrediente mandatorio, verificamos que esté en los usados
-                $usado = collect($recetaCuerpo['ingredientes_usados'])->first(function($ing) use ($alimentoId) {
-                    return isset($ing['id']) && $ing['id'] == $alimentoId;
-                });
+                // Si no hay ingredientes mandatorios, aceptamos
+                if ($ingredientesMandatorios->isEmpty()) break;
 
-                if ($usado) break; // IA cumplió la orden
+                // Verificar mandatorios
+                $idsUsados = collect($recetaCuerpo['ingredientes_usados'])->pluck('id')->filter()->toArray();
+                $todosPresentes = true;
+                foreach ($ingredientesMandatorios as $m) {
+                    if (!in_array($m->id, $idsUsados)) {
+                        $todosPresentes = false;
+                        break;
+                    }
+                }
+
+                if ($todosPresentes) break; 
                 
-                // Si llegamos aquí, la IA ignoró el ingrediente mandatorio. Reintentamos con un mensaje más agresivo.
-                $mensajeUsuario = "¡ERROR PREVIO! Olvidaste incluir el ingrediente obligatorio [{$ingredienteMandatorio->nombre}] (ID: {$alimentoId}). REINTENTA incluyendo este ingrediente SÍ O SÍ en 'ingredientes_usados'.";
+                $mensajeUsuario = "¡ERROR! Olvidaste incluir los ingredientes obligatorios [{$nombresMandatorios}]. REINTENTA incluyéndolos todos en 'ingredientes_usados'.";
             }
 
-            if (!$recetaCuerpo) return response()->json(['error' => 'Servicio de cocina no disponible.'], 500);
+            if (!$recetaCuerpo) return response()->json(['error' => 'No se pudo generar la receta. Por favor, inténtalo de nuevo.'], 500);
 
-            // Manejo de error gastronómico desde la IA
             if ($recetaCuerpo['titulo'] === 'ERROR_GASTRONOMICO') {
-                $sugerencias = collect($recetaCuerpo['ingredientes_extras'] ?? [])->pluck('nombre')->implode(', ');
                 return response()->json([
-                    'error' => 'La combinación de ingredientes actual no es apta para una receta lógica. Sugerencia: ' . $sugerencias
+                    'error' => 'No se pudo crear una receta coherente con estos ingredientes.'
                 ], 422);
             }
 
-            // Guardar automáticamente en el historial
+            // Gestionar límite de historial (9 recetas visibles en el historial)
+            // Contamos las recetas que se muestran en el historial: las que no son favoritas Y las favoritas que no están ocultas
+            $historialVisibleCount = Receta::where('user_id', $userId)
+                ->where(function($query) {
+                    $query->where('es_favorito', false)
+                          ->orWhere(function($q) {
+                              $q->where('es_favorito', true)
+                                ->where('ocultar_en_historial', false);
+                          });
+                })
+                ->count();
+
+            if ($historialVisibleCount >= 9) {
+                // Buscamos la más antigua que esté actualmente visible en el historial
+                $recetaParaGestionar = Receta::where('user_id', $userId)
+                    ->where(function($query) {
+                        $query->where('es_favorito', false)
+                              ->orWhere(function($q) {
+                                  $q->where('es_favorito', true)
+                                    ->where('ocultar_en_historial', false);
+                              });
+                    })
+                    ->orderBy('created_at', 'asc')
+                    ->first();
+
+                if ($recetaParaGestionar) {
+                    if ($recetaParaGestionar->es_favorito) {
+                        // Si es favorita, solo la ocultamos del historial para no borrarla de favoritos
+                        $recetaParaGestionar->update(['ocultar_en_historial' => true]);
+                    } else {
+                        // Si no es favorita, la borramos definitivamente
+                        $recetaParaGestionar->delete();
+                    }
+                }
+            }
+
+            // Guardamos el cuerpo COMPLETO que viene de la IA (incluyendo básicos y extras)
             $nuevaReceta = Receta::create([
                 'titulo' => $recetaCuerpo['titulo'],
-                'cuerpo' => $recetaCuerpo,
+                'cuerpo' => $recetaCuerpo, // El casting AsArrayObject en el modelo manejará la persistencia completa
                 'user_id' => $userId,
                 'es_favorito' => false,
             ]);
@@ -197,16 +263,33 @@ class RecetaController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Error Chef Senior: " . $e->getMessage());
-            return response()->json(['error' => 'Error en la propuesta técnica.'], 500);
+            Log::error("Error Generar Receta: " . $e->getMessage());
+            return response()->json(['error' => 'Error al procesar la receta.'], 500);
         }
+    }
+
+    public function destroyHistory()
+    {
+        $userId = Auth::id();
+
+        // 1. Las que NO son favoritas se borran definitivamente
+        Receta::where('user_id', $userId)
+            ->where('es_favorito', false)
+            ->delete();
+
+        // 2. Las que SÍ son favoritas se marcan como ocultas en el historial
+        Receta::where('user_id', $userId)
+            ->where('es_favorito', true)
+            ->update(['ocultar_en_historial' => true]);
+        
+        return back()->with('message', 'Historial limpiado correctamente');
     }
 
     public function cocinarReceta(Request $request)
     {
         $request->validate([
             'ingredientes' => 'required|array',
-            'ingredientes.*.cantidad_valor' => 'required|integer', // Forzamos entero
+            // Admitimos que algunos no tengan id (básicos) pero tengan cantidad_valor
         ]);
 
         try {
@@ -215,8 +298,8 @@ class RecetaController extends Controller
                 if (isset($item['id']) && !empty($item['id'])) {
                     $alimento = Alimento::find($item['id']);
                     if ($alimento) {
-                        $cantidadARestar = (int)$item['cantidad_valor'];
-                        $nuevaCantidad = (int)$alimento->cantidad - $cantidadARestar;
+                        $cantidadARestar = (float)($item['cantidad_valor'] ?? 0);
+                        $nuevaCantidad = (float)$alimento->cantidad - $cantidadARestar;
                         
                         if ($nuevaCantidad <= 0) {
                             $alimento->delete();
@@ -234,16 +317,44 @@ class RecetaController extends Controller
         }
     }
 
-    public function toggleFavorite($id)
+    public function toggleFavorito($id)
     {
-        $receta = Receta::where('user_id', Auth::id())->findOrFail($id);
-        $receta->update(['es_favorito' => !$receta->es_favorito]);
-        return response()->json(['es_favorito' => $receta->es_favorito]);
+        $userId = Auth::id();
+        $recetaOriginal = Receta::where('user_id', $userId)->findOrFail($id);
+        
+        // Si ya es favorita, simplemente la desmarcamos
+        if ($recetaOriginal->es_favorito) {
+            $recetaOriginal->update(['es_favorito' => false]);
+            
+            // Si además estaba oculta en el historial (porque el usuario la borró de ahí), 
+            // al dejar de ser favorita ya no tiene sentido mantenerla oculta (se borra del todo)
+            if ($recetaOriginal->ocultar_en_historial) {
+                $recetaOriginal->delete();
+                return response()->json(['es_favorito' => false, 'deleted' => true]);
+            }
+
+            return response()->json(['es_favorito' => false]);
+        }
+
+        // Si no es favorita, la marcamos como tal.
+        $recetaOriginal->update(['es_favorito' => true]);
+        
+        return response()->json(['es_favorito' => true]);
     }
 
     public function destroy($id)
     {
-        Receta::where('user_id', Auth::id())->findOrFail($id)->delete();
+        $userId = Auth::id();
+        $receta = Receta::where('user_id', $userId)->findOrFail($id);
+
+        // Si la receta es favorita, no la borramos de la DB, solo la ocultamos del historial
+        if ($receta->es_favorito) {
+            $receta->update(['ocultar_en_historial' => true]);
+        } else {
+            // Si no es favorita, se borra permanentemente
+            $receta->delete();
+        }
+
         return back();
     }
 }

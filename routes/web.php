@@ -19,15 +19,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Inicio (Dashboard)
     Route::get('/inicio', [DashboardController::class, 'index'])->name('inicio');
 
-    // Recetas con IA y Gestión de Historial
-    Route::controller(RecetaController::class)->group(function () {
-        Route::get('/mis-recetas', 'index')->name('recetas.index');
-        Route::post('/receta-rapida', 'generar')->name('recetas.ia');
-        Route::post('/recetas/cocinar', 'cocinarReceta')->name('recetas.cocinar');
-        Route::post('/recetas/{id}/favorito', 'toggleFavorite')->name('recetas.favorito');
-        Route::delete('/recetas/{id}', 'destroy')->name('recetas.destroy');
-    });
+    // Ayuda y Guía
+    Route::get('/ayuda', function () {
+        return Inertia::render('Ayuda/ComoFunciona');
+    })->name('ayuda.como-funciona');
 
+    // Recetas con IA y Gestión de Historial
+    // Gestión de Recetas IA
+    Route::controller(RecetaController::class)->group(function () {
+        Route::get('/recetas', 'index')->name('recetas.index');
+        Route::post('/recetas/generar', 'generar')->name('recetas.ia');
+        Route::post('/recetas/cocinar', 'cocinarReceta')->name('recetas.cocinar');
+        Route::post('/recetas/{receta}/favorito', 'toggleFavorito')->name('recetas.favorito');
+        Route::delete('/recetas/historial', 'destroyHistory')->name('recetas.destroyHistory');
+        Route::delete('/recetas/{receta}', 'destroy')->name('recetas.destroy');
+    });
     // Gestión de Perfil
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/perfil', 'edit')->name('perfil.edit');
@@ -40,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/inventario', 'index')->name('alimentos.index');
         Route::post('/alimentos', 'store')->name('alimentos.store');
         Route::put('/alimentos/{alimento}', 'update')->name('alimentos.update');
+        Route::delete('/alimentos/caducados', 'destroyExpired')->name('alimentos.destroyExpired');
         Route::delete('/alimentos/{alimento}', 'destroy')->name('alimentos.destroy');
         Route::post('/alimentos/{alimento}/ajustar-stock', 'ajustarStock')->name('alimentos.ajustarStock');
     });

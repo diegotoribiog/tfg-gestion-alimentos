@@ -184,7 +184,7 @@ onUnmounted(() => {
     <div class="w-full relative" ref="inputContainerRef">
         <!-- Input con Máscara y Guía Visual -->
         <div 
-            class="w-full h-[44px] bg-slate-50 dark:bg-midnight/50 rounded-2xl px-4 flex items-center justify-between border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-emerald-vibrant/20 transition-all shadow-sm group"
+            class="w-full h-[44px] bg-white dark:bg-midnight/50 rounded-2xl px-4 flex items-center justify-between border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-emerald-vibrant/20 transition-all shadow-sm group"
         >
             <div class="relative flex-1 h-full flex items-center">
                 <!-- Capa de Guía (DD/MM/YYYY) -->
@@ -219,23 +219,24 @@ onUnmounted(() => {
                 v-if="isOpen"
                 ref="calendarRef"
                 class="absolute z-[9999] w-[320px] bg-white dark:bg-midnight-card rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-slate-800 p-8 animate-in fade-in zoom-in duration-200"
+                @click.stop
             >
                 <!-- CABECERA NAVEGACIÓN -->
                 <div class="flex items-center justify-between mb-8">
-                    <button @click="changeMonth(-1)" class="p-3 hover:bg-slate-50 dark:hover:bg-midnight rounded-2xl text-slate-400 transition-all">
+                    <button type="button" @click.stop="changeMonth(-1)" class="p-3 hover:bg-slate-50 dark:hover:bg-midnight rounded-2xl text-slate-400 transition-all">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
                     </button>
                     
                     <div class="flex gap-2">
-                        <button @click="view = 'months'" class="text-[10px] font-black uppercase tracking-widest text-emerald-vibrant hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 px-3 py-1 rounded-xl transition-all">
+                        <button type="button" @click.stop="view = 'months'" class="text-[10px] font-black uppercase tracking-widest text-emerald-vibrant hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 px-3 py-1 rounded-xl transition-all">
                             {{ config.months[viewDate.getMonth()] }}
                         </button>
-                        <button @click="view = 'years'" class="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-midnight px-3 py-1 rounded-xl transition-all">
+                        <button type="button" @click.stop="view = 'years'" class="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-midnight px-3 py-1 rounded-xl transition-all">
                             {{ viewDate.getFullYear() }}
                         </button>
                     </div>
 
-                    <button @click="changeMonth(1)" class="p-3 hover:bg-slate-50 dark:hover:bg-midnight rounded-2xl text-slate-400 transition-all">
+                    <button type="button" @click.stop="changeMonth(1)" class="p-3 hover:bg-slate-50 dark:hover:bg-midnight rounded-2xl text-slate-400 transition-all">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
@@ -247,8 +248,9 @@ onUnmounted(() => {
                     </div>
                     <div class="grid grid-cols-7 gap-2">
                         <button 
+                            type="button"
                             v-for="(d, i) in days" :key="i"
-                            @click="selectDate(d)"
+                            @click.stop="selectDate(d)"
                             :class="[
                                 !d.current ? 'text-slate-200 dark:text-slate-700' : 'text-slate-600 dark:text-slate-300',
                                 props.modelValue === `${d.year}-${String(d.month + 1).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` 
@@ -271,8 +273,9 @@ onUnmounted(() => {
                 <!-- VISTA MESES -->
                 <div v-if="view === 'months'" class="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-2 duration-300">
                     <button 
+                        type="button"
                         v-for="(m, i) in config.months" :key="m"
-                        @click="selectMonth(i)"
+                        @click.stop="selectMonth(i)"
                         class="py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 hover:text-emerald-vibrant transition-all"
                         :class="{ 'bg-emerald-vibrant text-white shadow-lg': viewDate.getMonth() === i }"
                     >
@@ -283,8 +286,9 @@ onUnmounted(() => {
                 <!-- VISTA AÑOS -->
                 <div v-if="view === 'years'" class="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-2 duration-300">
                     <button 
+                        type="button"
                         v-for="y in years" :key="y"
-                        @click="selectYear(y)"
+                        @click.stop="selectYear(y)"
                         class="py-4 rounded-2xl text-[10px] font-black text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10 hover:text-emerald-vibrant transition-all"
                         :class="{ 'bg-emerald-vibrant text-white shadow-lg': viewDate.getFullYear() === y }"
                     >
@@ -295,7 +299,8 @@ onUnmounted(() => {
                 <!-- FOOTER -->
                 <div class="mt-8 pt-6 border-t border-slate-50 dark:border-slate-800 flex justify-center">
                     <button 
-                        @click="selectDate({ day: new Date().getDate(), month: new Date().getMonth(), year: new Date().getFullYear() })"
+                        type="button"
+                        @click.stop="selectDate({ day: new Date().getDate(), month: new Date().getMonth(), year: new Date().getFullYear() })"
                         class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 hover:text-emerald-vibrant transition-all"
                     >
                         Hoy

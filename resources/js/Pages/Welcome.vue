@@ -30,7 +30,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Bienvenido a MiDespensa" />
+    <Head title="Bienvenido a midespensa" />
 
     <div class="relative flex min-h-screen bg-white">
         
@@ -43,7 +43,7 @@ const submit = () => {
             
             <div class="relative z-10 flex flex-col items-center text-center px-12 text-white">
                 <h1 class="text-7xl font-extrabold tracking-tighter mb-6">
-                    Mi<span class="text-emerald-400">Despensa</span>
+                    mi<span class="text-emerald-400">despensa</span>
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed mb-10">
                     Gestiona tu inventario de comida de forma inteligente. 
@@ -68,7 +68,7 @@ const submit = () => {
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Mi<span class="text-emerald-500">Despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-10 text-center lg:text-left">
@@ -133,7 +133,7 @@ const submit = () => {
                 </form>
 
                 <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
-                    © 2026 MiDespensa · Gestión de Inventario Inteligente
+                    © 2026 midespensa · Gestión de Inventario Inteligente
                 </div>
             </div>
         </div>

@@ -14,6 +14,7 @@ class DashboardController extends Controller
     public function index(): Response
     {
         $userId = Auth::id();
+        $isNewUser = session('is_new_user', false);
         $hoy = Carbon::now()->startOfDay();
         $limite = Carbon::now()->addDays(7)->endOfDay();
 
@@ -46,6 +47,7 @@ class DashboardController extends Controller
                 'caducado' => $caducados,
             ],
             'productosUrgentes' => $productosUrgentes,
+            'isNewUser' => $isNewUser,
         ]);
     }
 }

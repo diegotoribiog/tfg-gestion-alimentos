@@ -1,6 +1,5 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/vue3';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -25,17 +24,16 @@ const submit = () => {
         <div class="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
             <img 
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                alt="Despensa organizada" 
+                alt="Seguridad" 
                 class="absolute inset-0 w-full h-full object-cover opacity-30"
             />
             
             <div class="relative z-10 flex flex-col items-center text-center px-12 text-white">
                 <h1 class="text-7xl font-extrabold tracking-tighter mb-6">
-                    Seguridad<br/><span class="text-emerald-400">Primero</span>
+                    Zona<br/><span class="text-emerald-400">Segura</span>
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed">
-                    Estás entrando en una zona protegida. 
-                    Por favor, confirma que eres tú para continuar.
+                    Estás entrando en una sección crítica. Por favor, confirma tu identidad para proteger tu despensa.
                 </p>
             </div>
         </div>
@@ -44,13 +42,13 @@ const submit = () => {
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Mi<span class="text-emerald-500">Despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-8 text-center lg:text-left">
-                    <h2 class="text-3xl font-bold text-gray-900">Área segura</h2>
-                    <p class="mt-4 text-sm text-gray-600 leading-relaxed italic">
-                        Esta es una zona de seguridad de tu cuenta. Por favor, confirma tu contraseña antes de continuar.
+                    <h2 class="text-3xl font-bold text-gray-900">Confirmar acceso</h2>
+                    <p class="mt-4 text-sm text-gray-600 leading-relaxed">
+                        Esta es una zona de seguridad. Por favor, introduce tu contraseña de midespensa para continuar.
                     </p>
                 </div>
 
@@ -60,7 +58,7 @@ const submit = () => {
                         <TextInput
                             id="password"
                             type="password"
-                            class="mt-1 block w-full bg-white border-gray-200 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                            class="mt-1 block w-full"
                             v-model="form.password"
                             required
                             autocomplete="current-password"
@@ -82,7 +80,7 @@ const submit = () => {
                 </form>
 
                 <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
-                    © 2026 MiDespensa · Protección de Datos
+                    © 2026 midespensa · Seguridad y Privacidad
                 </div>
             </div>
         </div>

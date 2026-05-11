@@ -50,6 +50,16 @@ class AlimentoController extends Controller
         return redirect()->back()->with('message', 'Alimento eliminado');
     }
 
+    // Elimina todos los alimentos caducados del usuario
+    public function destroyExpired(): RedirectResponse
+    {
+        $eliminados = auth()->user()->alimentos()
+            ->where('fecha_caducidad', '<', now()->toDateString())
+            ->delete();
+
+        return redirect()->back()->with('message', "Se han eliminado {$eliminados} productos caducados");
+    }
+
     // Lógica para ajustar stock (sumar o restar cantidad)
     public function ajustarStock(\Illuminate\Http\Request $request, Alimento $alimento): RedirectResponse
     {

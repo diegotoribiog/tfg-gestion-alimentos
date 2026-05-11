@@ -11,12 +11,14 @@ class Receta extends Model
         'titulo',
         'cuerpo',
         'es_favorito',
+        'ocultar_en_historial',
         'user_id',
     ];
 
     protected $casts = [
         'cuerpo' => 'array',
         'es_favorito' => 'boolean',
+        'ocultar_en_historial' => 'boolean',
     ];
 
     public function user(): BelongsTo

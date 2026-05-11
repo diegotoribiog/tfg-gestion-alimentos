@@ -33,6 +33,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user->primera_vez) {
+            $user->update(['primera_vez' => false]);
+            return redirect()->route('ayuda.como-funciona');
+        }
+
         return redirect()->intended(route('inicio', absolute: false));
     }
 

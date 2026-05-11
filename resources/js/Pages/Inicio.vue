@@ -1,6 +1,8 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Modal from "@/Components/Modal.vue";
+import ModalConfirm from "@/Components/ModalConfirm.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Head, Link, router } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import axios from "axios";
@@ -13,33 +15,56 @@ const props = defineProps({
         default: () => ({ bueno: 0, proximo: 0, caducado: 0 }),
     },
     productosUrgentes: { type: Array, default: () => [] },
+    isNewUser: { type: Boolean, default: false },
 });
+
+// Estado para onboarding
+const showOnboarding = ref(props.isNewUser && !localStorage.getItem('onboarding_visto'));
+
+const cerrarOnboarding = () => {
+    showOnboarding.value = false;
+    localStorage.setItem('onboarding_visto', 'true');
+};
+
+const irAAyuda = () => {
+    cerrarOnboarding();
+    router.get(route('ayuda.como-funciona'));
+};
 
 // Estado para la receta IA
 const loading = ref(false);
 const showModal = ref(false);
 const receta = ref(null);
-const error = ref(null);
+
+// Estado para modales de confirmación y alerta
+const showConfirmModal = ref(false);
+const showAlertModal = ref(false);
+const alertConfig = ref({ title: '', message: '', type: 'info' });
+const confirmConfig = ref({ title: '', message: '', onConfirm: () => {} });
+
+const showAlert = (title, message, type = 'info') => {
+    alertConfig.value = { title, message, type };
+    showAlertModal.value = true;
+};
+
+const showConfirm = (title, message, onConfirm) => {
+    confirmConfig.value = { title, message, onConfirm };
+    showConfirmModal.value = true;
+};
 
 const generarReceta = async (alimentoId = null) => {
     loading.value = true;
-    error.value = null;
     try {
-        const response = await axios.post(route('recetas.ia'), {
-            alimento_id: alimentoId
-        });
+        const payload = alimentoId ? { alimento_id: alimentoId } : {};
+        const response = await axios.post(route('recetas.ia'), payload);
         receta.value = response.data;
         showModal.value = true;
     } catch (e) {
-        error.value = e.response?.data?.error || "Error al conectar con el chef virtual.";
-        alert(error.value);
+        const errorMsg = e.response?.data?.error || "Error al conectar con el chef virtual.";
+        showAlert("Atención", errorMsg, "danger");
     } finally {
         loading.value = false;
     }
-};
-
-const generarRecetaCon = (alimento) => {
-    generarReceta(alimento.id);
 };
 
 const toggleFavorito = async () => {
@@ -48,33 +73,38 @@ const toggleFavorito = async () => {
         const response = await axios.post(route('recetas.favorito', receta.value.id));
         receta.value.es_favorito = response.data.es_favorito;
     } catch (e) {
-        alert("Error al actualizar favorito");
+        showAlert("Error", "Error al actualizar favorito", "danger");
     }
 };
 
 const cocinarYDescontar = async () => {
     if (!receta.value) return;
-    if (!confirm("¿Descontar ingredientes del stock actual?")) return;
     
-    try {
-        // Solo enviamos ingredientes que tienen ID (que existen en nuestro stock)
-        const ingredientesParaDescontar = receta.value.cuerpo.ingredientes_usados
-            .filter(ing => ing.id && !ing.es_basico)
-            .map(ing => ({
-                id: ing.id,
-                cantidad_valor: parseFloat(ing.cantidad_valor)
-            }));
+    showConfirm(
+        "¿Cocinar ahora?",
+        "¿Deseas descontar los ingredientes de tu stock actual?",
+        async () => {
+            try {
+                const ingredientesParaDescontar = receta.value.cuerpo.ingredientes_usados
+                    .filter(ing => ing.id && !ing.es_basico)
+                    .map(ing => ({
+                        id: ing.id,
+                        cantidad_valor: parseFloat(ing.cantidad_valor)
+                    }));
 
-        await axios.post(route('recetas.cocinar'), {
-            ingredientes: ingredientesParaDescontar
-        });
-        
-        alert("¡Buen provecho! Stock actualizado.");
-        showModal.value = false;
-        router.reload({ preserveScroll: true });
-    } catch (e) {
-        alert(e.response?.data?.error || "Error técnico al actualizar stock.");
-    }
+                await axios.post(route('recetas.cocinar'), {
+                    ingredientes: ingredientesParaDescontar
+                });
+                
+                showModal.value = false;
+                showAlert("¡Buen provecho!", "Stock actualizado correctamente.", "success");
+                router.reload({ preserveScroll: true });
+            } catch (e) {
+                showAlert("Error", e.response?.data?.error || "Error técnico al actualizar stock.", "danger");
+            }
+        },
+        "success"
+    );
 };
 
 // Porcentajes para la visualización del estado
@@ -101,7 +131,13 @@ const getRelativo = (fecha) => {
     return `Caduca en ${dif} días`;
 };
 
-const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.delete(route("alimentos.destroy", id));
+const eliminar = (id) => {
+    showConfirm(
+        "¿Eliminar alimento?",
+        "Esta acción quitará el producto de tu despensa definitivamente.",
+        () => router.delete(route("alimentos.destroy", id))
+    );
+};
 </script>
 
 <template>
@@ -112,7 +148,7 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
             
             <!-- FILA 1: MÉTRICAS COMPACTAS -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group">
+                <Link :href="route('alimentos.index')" class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group hover:border-emerald-vibrant/50 transition-all">
                     <div class="bg-emerald-vibrant/10 text-emerald-vibrant w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl shadow-inner group-hover:scale-110 transition-transform">
                         {{ total }}
                     </div>
@@ -120,21 +156,21 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                         <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500">Total</p>
                         <h4 class="text-slate-900 dark:text-white font-black text-xl uppercase tracking-tighter">Alimentos</h4>
                     </div>
-                </div>
+                </Link>
 
-                <div class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group">
+                <Link :href="route('alimentos.index')" class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group hover:border-rose-500/50 transition-all">
                     <div class="bg-rose-500/10 text-rose-600 dark:text-rose-400 w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl shadow-inner group-hover:scale-110 transition-transform">
                         {{ alertaCaducidad }}
                     </div>
                     <div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500">Urgente</p>
-                        <h4 class="text-slate-900 dark:text-white font-black text-xl uppercase tracking-tighter">Alertas</h4>
+                        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-slate-500">Alertas</p>
+                        <h4 class="text-slate-900 dark:text-white font-black text-xl uppercase tracking-tighter">Caducidad</h4>
                     </div>
-                </div>
+                </Link>
 
-                <Link :href="route('alimentos.index')" class="bg-slate-900 dark:bg-emerald-vibrant p-6 rounded-[2rem] flex flex-col items-center justify-center text-center group hover:scale-[1.02] transition-all shadow-xl shadow-slate-200/50 dark:shadow-none min-h-[120px]">
+                <Link :href="route('alimentos.index')" class="bg-emerald-vibrant p-6 rounded-[2rem] flex flex-col items-center justify-center text-center group hover:scale-[1.02] transition-all shadow-xl shadow-emerald-500/20 dark:shadow-none min-h-[120px]">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white group-hover:rotate-12 transition-transform">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white group-hover:rotate-12 transition-transform">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </div>
                         <span class="text-white font-black text-sm uppercase tracking-widest">Gestionar</span>
@@ -142,7 +178,7 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                 </Link>
             </div>
 
-            <!-- SECCIÓN DE ESTADO Y LISTADO (REVERTIDO A DISEÑO ORIGINAL) -->
+            <!-- SECCIÓN DE ESTADO Y LISTADO -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
                 
                 <!-- GRÁFICA DE CONSERVACIÓN -->
@@ -150,17 +186,19 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                     <div class="flex flex-col items-center flex-1 justify-center">
                         <h3 class="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.5em] mb-10 text-center">Estado de tus Alimentos</h3>
                         
-                        <div v-if="total > 0" class="w-full flex flex-col items-center gap-10">
+                        <div class="w-full flex flex-col items-center gap-10">
                             <!-- Gráfico Circular -->
                             <div class="relative w-56 h-56 flex items-center justify-center flex-shrink-0">
                                 <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                     <circle cx="50" cy="50" r="40" fill="none" class="stroke-slate-50 dark:stroke-slate-800/50" stroke-width="12" />
-                                    <circle cx="50" cy="50" r="40" fill="none" class="stroke-rose-500" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${porcentajes.caducado * 2.51} 251.2`" pathLength="251.2" />
-                                    <circle cx="50" cy="50" r="40" fill="none" class="stroke-orange-400" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${porcentajes.proximo * 2.51} 251.2`" :stroke-dashoffset="`-${porcentajes.caducado * 2.51}`" pathLength="251.2" />
-                                    <circle cx="50" cy="50" r="40" fill="none" class="stroke-emerald-vibrant" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${porcentajes.bueno * 2.51} 251.2`" :stroke-dashoffset="`-${((porcentajes.caducado || 0) + (porcentajes.proximo || 0)) * 2.51}`" pathLength="251.2" />
+                                    <g v-if="total > 0">
+                                        <circle cx="50" cy="50" r="40" fill="none" class="stroke-rose-500" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${(porcentajes.caducado || 0) * 2.51} 251.2`" pathLength="251.2" />
+                                        <circle cx="50" cy="50" r="40" fill="none" class="stroke-orange-400" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${(porcentajes.proximo || 0) * 2.51} 251.2`" :stroke-dashoffset="`-${(porcentajes.caducado || 0) * 2.51}`" pathLength="251.2" />
+                                        <circle cx="50" cy="50" r="40" fill="none" class="stroke-emerald-vibrant" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${(porcentajes.bueno || 0) * 2.51} 251.2`" :stroke-dashoffset="`-${((porcentajes.caducado || 0) + (porcentajes.proximo || 0)) * 2.51}`" pathLength="251.2" />
+                                    </g>
                                 </svg>
                                 <div class="absolute flex flex-col items-center">
-                                    <span class="text-4xl font-black text-slate-900 dark:text-white">{{ total }}</span>
+                                    <span class="text-4xl font-black text-slate-900 dark:text-white">{{ total || 0 }}</span>
                                     <span class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest">Total</span>
                                 </div>
                             </div>
@@ -169,15 +207,15 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
                                 <div class="flex flex-col items-center p-5 rounded-2xl bg-slate-50/50 dark:bg-midnight/30 border border-slate-100 dark:border-slate-800/50">
                                     <span class="text-[10px] font-black uppercase text-emerald-vibrant tracking-widest mb-1">En Fecha</span>
-                                    <p class="text-3xl font-black text-slate-900 dark:text-white leading-none">{{ conteo.bueno }}</p>
+                                    <p class="text-3xl font-black text-slate-900 dark:text-white leading-none">{{ conteo.bueno || 0 }}</p>
                                 </div>
                                 <div class="flex flex-col items-center p-5 rounded-2xl bg-slate-50/50 dark:bg-midnight/30 border border-slate-100 dark:border-slate-800/50">
                                     <span class="text-[10px] font-black uppercase text-orange-500 dark:text-orange-400 tracking-widest mb-1">Próximos</span>
-                                    <p class="text-3xl font-black text-slate-900 dark:text-white leading-none">{{ conteo.proximo }}</p>
+                                    <p class="text-3xl font-black text-slate-900 dark:text-white leading-none">{{ conteo.proximo || 0 }}</p>
                                 </div>
                                 <div class="flex flex-col items-center p-5 rounded-2xl bg-slate-50/50 dark:bg-midnight/30 border border-slate-100 dark:border-slate-800/50">
                                     <span class="text-[10px] font-black uppercase text-rose-500 dark:text-rose-400 tracking-widest mb-1">Caducados</span>
-                                    <p class="text-3xl font-black text-slate-900 dark:text-white leading-none">{{ conteo.caducado }}</p>
+                                    <p class="text-3xl font-black text-slate-900 dark:text-white leading-none">{{ conteo.caducado || 0 }}</p>
                                 </div>
                             </div>
                         </div>
@@ -193,23 +231,16 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                             <div class="min-w-0 flex-1">
                                 <h4 class="font-black text-slate-900 dark:text-slate-100 uppercase text-xs tracking-tight mb-2 truncate group-hover:text-emerald-vibrant transition-colors">{{ a.nombre }}</h4>
                                 <div class="flex items-center gap-2">
-                                    <span :class="new Date(a.fecha_caducidad) < new Date() ? 'bg-rose-500' : 'bg-orange-400'" class="w-2 h-2 rounded-full"></span>
-                                    <p class="text-[11px] tracking-widest uppercase font-black" :class="new Date(a.fecha_caducidad) < new Date() ? 'text-rose-600' : 'text-orange-500'">{{ getRelativo(a.fecha_caducidad) }}</p>
+                                    <span :class="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ? 'bg-rose-500' : 'bg-orange-400'" class="w-2 h-2 rounded-full"></span>
+                                    <p class="text-[11px] tracking-widest uppercase font-black" :class="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ? 'text-rose-600' : 'text-orange-500'">{{ getRelativo(a.fecha_caducidad) }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 ml-4">
                                 <button 
-                                    @click="generarRecetaCon(a)" 
-                                    :disabled="loading"
-                                    title="Generar receta con este ingrediente"
-                                    class="opacity-0 group-hover:opacity-100 p-3 rounded-xl bg-emerald-vibrant/10 text-emerald-vibrant hover:bg-emerald-vibrant hover:text-white transition-all shadow-sm border border-emerald-vibrant/20 disabled:opacity-30"
+                                    v-if="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)"
+                                    @click="eliminar(a.id)" 
+                                    class="opacity-0 group-hover:opacity-100 p-3 rounded-xl bg-white dark:bg-slate-700 text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100 dark:border-slate-600"
                                 >
-                                    <svg v-if="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                    <span v-else class="animate-spin block w-5 h-5 border-2 border-current border-t-transparent rounded-full"></span>
-                                </button>
-                                <button @click="eliminar(a.id)" class="opacity-0 group-hover:opacity-100 p-3 rounded-xl bg-white dark:bg-slate-700 text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100 dark:border-slate-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
                             </div>
@@ -219,15 +250,15 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
             </div>
 
             <!-- FILA 3: BANNER RECETA -->
-            <div class="bg-slate-900 dark:bg-midnight-card p-8 sm:p-12 rounded-[3rem] text-white shadow-2xl border border-white/5 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group backdrop-blur-sm">
+            <div class="bg-white dark:bg-midnight-card p-8 sm:p-12 rounded-[3rem] shadow-sm dark:shadow-2xl border border-slate-200/60 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group backdrop-blur-sm">
                 <div class="space-y-4 text-center md:text-left relative z-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tighter uppercase leading-none">¿Qué cocinamos hoy?</h2>
-                    <p class="text-slate-400 text-sm sm:text-base font-medium max-w-xl leading-relaxed">Analizamos tu despensa priorizando los alimentos más próximos a caducar para generarte una receta deliciosa y evitar el desperdicio.</p>
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tighter uppercase leading-none text-slate-900 dark:text-white">¿Qué cocinamos hoy?</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm sm:text-base font-medium max-w-xl leading-relaxed">Analizamos tu despensa priorizando los alimentos con caducidad más cercana para ofrecerte una receta deliciosa y evitar que nada se pierda.</p>
                 </div>
                 <button 
-                    @click="generarReceta" 
+                    @click="generarReceta()" 
                     :disabled="loading"
-                    class="bg-emerald-vibrant hover:bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-3 shrink-0 relative z-10"
+                    class="bg-emerald-vibrant hover:bg-emerald-600 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-110 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-3 shrink-0 relative z-10 hover:shadow-2xl hover:shadow-emerald-500/40"
                 >
                     <svg v-if="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     <span v-else class="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full"></span>
@@ -236,7 +267,7 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
             </div>
         </div>
 
-        <!-- MODAL DE RECETA IA (DISEÑO MINIMALISTA) -->
+        <!-- MODAL DE RECETA IA -->
         <Modal :show="showModal" @close="showModal = false" maxWidth="xl">
             <div class="bg-white dark:bg-midnight rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200/60 dark:border-slate-800/50">
                 <div class="p-8 pb-4 text-center space-y-2">
@@ -255,33 +286,36 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                     <div class="space-y-4">
                         <h3 class="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-[0.4em] text-center mb-6">Lista de Ingredientes</h3>
                         <div class="space-y-2">
-                            <!-- Ingredientes que sí tenemos en la despensa -->
+                            <!-- Ingredientes de Stock -->
                             <template v-for="(ing, i) in receta?.cuerpo.ingredientes_usados.filter(i => !i.es_basico)" :key="'u-'+i">
                                 <div v-if="ing.nombre && ing.nombre !== '-'" class="flex items-center justify-between py-3 border-b border-slate-200/60 dark:border-slate-800/50">
-                                    <span class="text-xs font-bold text-emerald-vibrant uppercase tracking-tight">
-                                        {{ ing.nombre }} - {{ ing.cantidad_valor }} {{ ing.unidad }}
-                                    </span>
-                                    <span class="text-[9px] font-black text-emerald-600/40 uppercase tracking-widest">Stock</span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs font-bold text-emerald-vibrant uppercase tracking-tight">{{ ing.nombre }}</span>
+                                        <span class="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-vibrant/10 text-emerald-vibrant">Stock</span>
+                                    </div>
+                                    <span class="text-xs font-black text-slate-900 dark:text-white uppercase">{{ ing.cantidad_valor }} {{ ing.unidad }}</span>
                                 </div>
                             </template>
 
-                            <!-- Condimentos Básicos (Staples) -->
+                            <!-- Ingredientes Básicos -->
                             <template v-for="(ing, i) in receta?.cuerpo.ingredientes_usados.filter(i => i.es_basico)" :key="'b-'+i">
                                 <div v-if="ing.nombre && ing.nombre !== '-'" class="flex items-center justify-between py-3 border-b border-slate-200/60 dark:border-slate-800/50">
-                                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">
-                                        {{ ing.nombre }} - {{ ing.cantidad_valor }} {{ ing.unidad }}
-                                    </span>
-                                    <span class="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Básicos</span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">{{ ing.nombre }}</span>
+                                        <span class="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md bg-slate-50 dark:bg-midnight/50 text-slate-400">Básico</span>
+                                    </div>
+                                    <span class="text-xs font-black text-slate-900 dark:text-white uppercase">{{ ing.cantidad_valor }} {{ ing.unidad }}</span>
                                 </div>
                             </template>
 
-                            <!-- Ingredientes sugeridos (no están en la despensa) -->
+                            <!-- Sugerencias -->
                             <template v-for="(ing, i) in receta?.cuerpo.ingredientes_extras" :key="'f-'+i">
                                 <div v-if="ing.nombre && ing.nombre !== '-'" class="flex items-center justify-between py-3 border-b border-slate-200/60 dark:border-slate-800/50 opacity-80">
-                                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight italic">
-                                        {{ ing.nombre }} - {{ ing.cantidad }} 
-                                    </span>
-                                    <span class="text-[9px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest">Sugerencia</span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight italic">{{ ing.nombre }}</span>
+                                        <span class="text-[8px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest px-2 py-0.5 rounded-md bg-slate-50 dark:bg-midnight/50">Sugerencia</span>
+                                    </div>
+                                    <span class="text-xs font-black text-slate-400 dark:text-slate-500 uppercase">{{ ing.cantidad }}</span>
                                 </div>
                             </template>
                         </div>
@@ -306,8 +340,8 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
                     <div class="flex items-center justify-center gap-4 w-full">
                         <button 
                             @click="toggleFavorito"
-                            class="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all"
-                            :class="receta?.es_favorito ? 'bg-rose-500 text-white shadow-lg shadow-rose-100' : 'bg-white dark:bg-midnight-card text-slate-400 border border-slate-100 dark:border-slate-700'"
+                            class="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 hover:scale-110"
+                            :class="receta?.es_favorito ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:bg-rose-600' : 'bg-white dark:bg-midnight-card text-slate-400 border border-slate-100 dark:border-slate-700 hover:text-rose-500 hover:border-rose-200 dark:hover:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-500/5'"
                         >
                             <svg class="w-4 h-4" :fill="receta?.es_favorito ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -317,13 +351,52 @@ const eliminar = (id) => confirm("¿Deseas eliminar este producto?") && router.d
 
                         <button 
                             @click="cocinarYDescontar"
-                            class="flex-1 bg-slate-900 dark:bg-emerald-vibrant text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-slate-200 dark:shadow-none transition-all active:scale-95"
+                            class="flex-1 bg-slate-900 dark:bg-emerald-vibrant text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 hover:scale-110 hover:bg-slate-800 dark:hover:bg-emerald-600 hover:shadow-emerald-500/20"
                         >
                             Cocinar Ahora
                         </button>
                     </div>
                     <button @click="showModal = false" class="text-[9px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest hover:text-slate-500 transition-colors">
                         Cerrar Propuesta
+                    </button>
+                </div>
+            </div>
+        </Modal>
+
+        <!-- MODALES DE SISTEMA -->
+        <ModalConfirm 
+            :show="showConfirmModal" 
+            :title="confirmConfig.title" 
+            :message="confirmConfig.message" 
+            :type="confirmConfig.type"
+            @close="showConfirmModal = false" 
+            @confirm="() => { confirmConfig.onConfirm(); showConfirmModal = false; }" 
+        />
+        <ModalConfirm 
+            :show="showAlertModal" 
+            :title="alertConfig.title" 
+            :message="alertConfig.message" 
+            :type="alertConfig.type" 
+            isAlert 
+            @close="showAlertModal = false" 
+        />
+
+        <!-- MODAL: BIENVENIDA (ONBOARDING) -->
+        <Modal :show="showOnboarding" @close="cerrarOnboarding" maxWidth="sm">
+            <div class="p-10 bg-white dark:bg-midnight border border-slate-200/60 dark:border-slate-800/50 rounded-[3rem] text-center">
+                <div class="w-20 h-20 bg-emerald-vibrant text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-500/30">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter uppercase">¡Hola, chef!</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed mb-10">
+                    Bienvenido a midespensa. ¿Quieres que te enseñemos cómo organizar tu cocina de forma inteligente?
+                </p>
+                <div class="flex flex-col gap-4">
+                    <PrimaryButton @click="irAAyuda" class="w-full justify-center py-5 bg-emerald-vibrant text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl">
+                        Sí, enséñame
+                    </PrimaryButton>
+                    <button @click="cerrarOnboarding" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">
+                        Quizás más tarde
                     </button>
                 </div>
             </div>

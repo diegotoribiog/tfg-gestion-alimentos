@@ -1,0 +1,23 @@
+{
+    "Log in": "Iniciar sesión",
+    "Register": "Registrarse",
+    "Remember me": "Recordarme",
+    "Forgot your password?": "¿Olvidaste tu contraseña?",
+    "Email": "Correo electrónico",
+    "Password": "Contraseña",
+    "Confirm Password": "Confirmar contraseña",
+    "Name": "Nombre",
+    "Already registered?": "¿Ya estás registrado?",
+    "Send Password Reset Link": "Enviar enlace de recuperación",
+    "Reset Password": "Restablecer contraseña",
+    "Verify Your Email Address": "Verifica tu correo electrónico",
+    "A fresh verification link has been sent to your email address.": "Se ha enviado un nuevo enlace de verificación a tu correo.",
+    "Before proceeding, please check your email for a verification link.": "Antes de continuar, revisa tu correo para ver el enlace de verificación.",
+    "If you did not receive the email": "Si no recibiste el correo",
+    "click here to request another": "haz clic aquí para solicitar otro",
+    "Whoops! Something went wrong.": "¡Vaya! Algo ha ido mal.",
+    "These credentials do not match our records.": "Estas credenciales no coinciden con nuestros registros.",
+    "The provided password is incorrect.": "La contraseña proporcionada es incorrecta.",
+    "The :attribute must be at least :length characters.": "El campo :attribute debe tener al menos :length caracteres.",
+    "The :attribute field is required.": "El campo :attribute es obligatorio."
+}

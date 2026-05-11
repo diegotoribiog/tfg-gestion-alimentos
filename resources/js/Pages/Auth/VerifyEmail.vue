@@ -3,19 +3,16 @@ import { computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
-// Recibimos el 'status' para saber si acabamos de reenviar el correo de verificación
 const props = defineProps({
     status: String,
 });
 
 const form = useForm({});
 
-// Función para solicitar un nuevo enlace de verificación
 const submit = () => {
     form.post(route('verification.send'));
 };
 
-// Comprobamos si el mensaje de estado indica que el correo se envió con éxito
 const verificationLinkSent = computed(() => props.status === 'verification-link-sent');
 </script>
 
@@ -33,10 +30,10 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
             
             <div class="relative z-10 flex flex-col items-center text-center px-12 text-white">
                 <h1 class="text-7xl font-extrabold tracking-tighter mb-6">
-                    Casi<br/><span class="text-emerald-400">Listo</span>
+                    Todo<br/><span class="text-emerald-400">Listo</span>
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed">
-                    Solo un paso más para empezar a organizar tu despensa de forma inteligente.
+                    Verifica tu correo electrónico para empezar a reducir el desperdicio en tu hogar.
                 </p>
             </div>
         </div>
@@ -45,13 +42,13 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Mi<span class="text-emerald-500">Despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-8 text-center lg:text-left">
-                    <h2 class="text-3xl font-bold text-gray-900">Verifica tu cuenta</h2>
+                    <h2 class="text-3xl font-bold text-gray-900">Confirma tu cuenta</h2>
                     <p class="mt-4 text-sm text-gray-600 leading-relaxed">
-                        ¡Gracias por registrarte! Antes de comenzar, ¿podrías verificar tu dirección de correo electrónico haciendo clic en el enlace que te acabamos de enviar? Si no lo recibiste, te enviaremos otro con gusto.
+                        ¡Bienvenido a midespensa! Antes de empezar a organizar tus alimentos, ¿podrías confirmar tu dirección de correo electrónico haciendo clic en el enlace que te enviamos? Si no lo has recibido, solicita uno nuevo aquí mismo.
                     </p>
                 </div>
 
@@ -81,7 +78,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                 </form>
 
                 <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
-                    © 2026 MiDespensa · Activación de Cuenta
+                    © 2026 midespensa · Activación de Cuenta
                 </div>
             </div>
         </div>

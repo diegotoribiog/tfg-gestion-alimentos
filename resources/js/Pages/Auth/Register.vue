@@ -21,7 +21,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Crear cuenta - MiDespensa" />
+    <Head title="Crear cuenta - midespensa" />
 
     <div class="relative flex min-h-screen bg-white">
         
@@ -34,7 +34,7 @@ const submit = () => {
             
             <div class="relative z-10 flex flex-col items-center text-center px-12 text-white">
                 <h1 class="text-7xl font-extrabold tracking-tighter mb-6">
-                    Únete a <br/> Mi<span class="text-emerald-400">Despensa</span>
+                    Únete a <br/> mi<span class="text-emerald-400">despensa</span>
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed">
                     Empieza hoy mismo a organizar tu cocina. 
@@ -47,7 +47,7 @@ const submit = () => {
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-10 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Mi<span class="text-emerald-500">Despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-10 text-center lg:text-left">
@@ -93,7 +93,7 @@ const submit = () => {
                         <TextInput
                             id="password"
                             type="password"
-                            class="mt-1 block w-full bg-white border-gray-200 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                            class="mt-1 block w-full"
                             v-model="form.password"
                             required
                             autocomplete="new-password"
@@ -128,7 +128,7 @@ const submit = () => {
                 </form>
 
                 <div class="mt-12 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold italic">
-                    Al registrarte, aceptas nuestras condiciones de uso
+                    © 2026 midespensa · Al registrarte, aceptas nuestras condiciones
                 </div>
             </div>
         </div>

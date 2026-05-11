@@ -5,7 +5,6 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 
-// Recibimos el 'status' para confirmar que el email se ha enviado correctamente
 defineProps({
     status: String,
 });
@@ -20,24 +19,23 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Recuperar contraseña" />
+    <Head title="Recuperar acceso" />
 
     <div class="relative flex min-h-screen bg-white">
         
         <div class="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
             <img 
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                alt="Despensa organizada" 
+                alt="Cocina" 
                 class="absolute inset-0 w-full h-full object-cover opacity-30"
             />
             
             <div class="relative z-10 flex flex-col items-center text-center px-12 text-white">
                 <h1 class="text-7xl font-extrabold tracking-tighter mb-6">
-                    No pasa<br/><span class="text-emerald-400">nada</span>
+                    Vuelve a<br/><span class="text-emerald-400">Cocinar</span>
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed">
-                    A todos se nos olvida algo de vez en cuando. 
-                    Te ayudamos a recuperar el acceso a MiDespensa.
+                    Te ayudamos a recuperar tu acceso para que sigas gestionando tu cocina de forma inteligente.
                 </p>
             </div>
         </div>
@@ -46,13 +44,13 @@ const submit = () => {
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Mi<span class="text-emerald-500">Despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 text-center lg:text-left">¿Olvidaste tu clave?</h2>
+                    <h2 class="text-3xl font-bold text-gray-900 text-center lg:text-left">Recuperar acceso</h2>
                     <p class="mt-4 text-sm text-gray-600 leading-relaxed text-center lg:text-left">
-                        Introduce tu correo electrónico y te enviaremos un enlace para que puedas elegir una nueva contraseña y volver a organizar tu inventario.
+                        Introduce tu correo electrónico y te enviaremos un enlace seguro para restablecer tu contraseña y volver a midespensa.
                     </p>
                 </div>
 
@@ -66,7 +64,7 @@ const submit = () => {
                         <TextInput
                             id="email"
                             type="email"
-                            class="mt-1 block w-full bg-white border-gray-200 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                            class="mt-1 block w-full bg-white"
                             v-model="form.email"
                             required
                             autofocus
@@ -91,7 +89,7 @@ const submit = () => {
                 </form>
 
                 <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
-                    © 2026 MiDespensa · Recuperación Segura
+                    © 2026 midespensa · Gestión Inteligente de Alimentos
                 </div>
             </div>
         </div>
