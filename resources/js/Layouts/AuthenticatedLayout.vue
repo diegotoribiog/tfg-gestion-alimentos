@@ -259,7 +259,7 @@ onMounted(() => {
                 <div class="border-t border-slate-100 dark:border-slate-800 pb-1 pt-4 bg-slate-50 dark:bg-slate-900/50">
                     <div class="px-4 flex items-center gap-3">
                         <div
-                            class="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold shadow-lg shadow-emerald-500/20"
+                            class="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold shadow-lg"
                         >
                             {{
                                 $page.props.auth.user.name

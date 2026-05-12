@@ -254,7 +254,7 @@ onUnmounted(() => {
                             :class="[
                                 !d.current ? 'text-slate-200 dark:text-slate-700' : 'text-slate-600 dark:text-slate-300',
                                 props.modelValue === `${d.year}-${String(d.month + 1).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` 
-                                    ? 'bg-emerald-vibrant text-white shadow-xl shadow-emerald-500/20 dark:shadow-none font-bold scale-110' 
+                                    ? 'bg-emerald-vibrant text-white shadow-xl dark:shadow-none font-bold scale-110' 
                                     : 'hover:bg-emerald-50 dark:hover:bg-emerald-vibrant/10'
                             ]"
                             class="h-10 w-10 rounded-2xl text-[10px] font-black flex flex-col items-center justify-center transition-all relative"

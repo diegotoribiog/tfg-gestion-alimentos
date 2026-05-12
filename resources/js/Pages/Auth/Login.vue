@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 // Importación de componentes reutilizables de Breeze para mantener la lógica de Laravel
 import Checkbox from '@/Components/Checkbox.vue';
 import InputError from '@/Components/InputError.vue';
@@ -32,8 +33,13 @@ const submit = () => {
 <template>
     <Head title="Bienvenido a midespensa" />
 
-    <div class="relative flex min-h-screen bg-white">
+    <div class="relative flex min-h-screen bg-white dark:bg-midnight transition-colors duration-500">
         
+        <!-- Botón de Modo Oscuro -->
+        <div class="fixed top-5 right-5 z-50">
+            <ThemeToggle />
+        </div>
+
         <div class="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
             <img 
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
@@ -64,18 +70,18 @@ const submit = () => {
             </div>
         </div>
 
-        <div class="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-24 bg-gray-50">
+        <div class="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-24 bg-gray-50 dark:bg-midnight transition-colors duration-500">
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-10 text-center lg:text-left">
-                    <h2 class="text-3xl font-bold text-gray-900">Iniciar sesión</h2>
-                    <p class="text-gray-500 mt-3 font-medium">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Iniciar sesión</h2>
+                    <p class="text-gray-500 dark:text-slate-400 mt-3 font-medium">
                         ¿Aún no tienes cuenta? 
-                        <Link :href="route('register')" class="text-emerald-600 font-bold hover:text-emerald-700 transition decoration-2 underline-offset-4">Regístrate</Link>
+                        <Link :href="route('register')" class="text-emerald-600 dark:text-emerald-500 font-bold hover:text-emerald-700 dark:hover:text-emerald-400 transition decoration-2 underline-offset-4">Regístrate</Link>
                     </p>
                 </div>
 
@@ -85,11 +91,11 @@ const submit = () => {
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <div>
-                        <InputLabel for="email" value="Correo electrónico" class="text-gray-600 ml-1" />
+                        <InputLabel for="email" value="Correo electrónico" class="text-gray-600 dark:text-slate-400 ml-1" />
                         <TextInput
                             id="email"
                             type="email"
-                            class="mt-1 block w-full bg-white border-gray-200 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
+                            class="mt-1 block w-full bg-white dark:bg-midnight/50 border-gray-200 dark:border-slate-700 rounded-xl py-3 focus:border-emerald-500 focus:ring-emerald-500 shadow-sm"
                             v-model="form.email"
                             required
                             autofocus
@@ -100,8 +106,8 @@ const submit = () => {
 
                     <div>
                         <div class="flex justify-between items-center ml-1">
-                            <InputLabel for="password" value="Contraseña" class="text-gray-600" />
-                            <Link :href="route('password.request')" class="text-xs text-gray-400 hover:text-emerald-600 transition">
+                            <InputLabel for="password" value="Contraseña" class="text-gray-600 dark:text-slate-400" />
+                            <Link :href="route('password.request')" class="text-xs text-gray-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
                                 ¿La has olvidado?
                             </Link>
                         </div>
@@ -117,13 +123,13 @@ const submit = () => {
                     </div>
 
                     <div class="flex items-center ml-1">
-                        <Checkbox name="remember" v-model:checked="form.remember" class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                        <span class="ms-2 text-sm text-gray-500">Recordar mi sesión</span>
+                        <Checkbox name="remember" v-model:checked="form.remember" class="rounded border-gray-300 dark:border-slate-700 text-emerald-600 focus:ring-emerald-500 dark:bg-midnight/50" />
+                        <span class="ms-2 text-sm text-gray-500 dark:text-slate-400">Recordar mi sesión</span>
                     </div>
 
                     <div class="pt-2">
                         <PrimaryButton
-                            class="w-full justify-center bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold transition-all transform active:scale-[0.98] shadow-lg shadow-emerald-200"
+                            class="w-full justify-center bg-emerald-600 dark:bg-emerald-vibrant hover:bg-emerald-700 dark:hover:bg-emerald-600 text-white py-4 rounded-xl font-bold transition-all transform active:scale-[0.98] shadow-lg dark:shadow-none"
                             :class="{ 'opacity-25': form.processing }"
                             :disabled="form.processing"
                         >
@@ -132,7 +138,7 @@ const submit = () => {
                     </div>
                 </form>
 
-                <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
+                <div class="mt-16 text-center text-[10px] text-gray-400 dark:text-slate-600 uppercase tracking-widest font-semibold">
                     © 2026 midespensa · Gestión de Inventario Inteligente
                 </div>
             </div>

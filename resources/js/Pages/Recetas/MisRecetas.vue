@@ -195,7 +195,7 @@ const cocinarYDescontar = async () => {
                 </div>
 
                 <div v-if="historialReciente.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div v-for="r in historialReciente" :key="r.id" class="bg-white dark:bg-midnight-card backdrop-blur-sm rounded-[2.5rem] border border-slate-200/60 dark:border-slate-700/50 overflow-hidden group hover:border-emerald-vibrant/50 transition-all cursor-pointer flex flex-col h-full" @click="verReceta(r)">
+                    <div v-for="r in historialReciente" :key="r.id" class="bg-white dark:bg-midnight-card backdrop-blur-sm rounded-[2.5rem] border border-slate-200/60 dark:border-slate-700/50 overflow-hidden group dark:hover:border-emerald-vibrant/50 transition-all cursor-pointer flex flex-col h-full" @click="verReceta(r)">
                         <div class="p-8 space-y-5 flex-1">
                             <div class="flex items-center justify-between"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ new Date(r.created_at).toLocaleDateString() }}</span><button @click.stop="toggleFavorito(r)" class="text-slate-200 dark:text-slate-700 hover:text-rose-500 hover:scale-110 transition-all"><svg class="w-5 h-5" :fill="r.es_favorito ? 'currentColor' : 'none'" :class="{ 'text-rose-500': r.es_favorito }" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></button></div>
                             <h3 class="text-lg font-black text-slate-700 dark:text-slate-200 uppercase tracking-tight group-hover:text-emerald-vibrant transition-colors">{{ r.titulo }}</h3>
@@ -268,7 +268,7 @@ const cocinarYDescontar = async () => {
                         </button>
                         
                         <!-- BOTÓN COCINAR -->
-                        <button @click="cocinarYDescontar" class="flex-1 bg-slate-900 dark:bg-emerald-vibrant text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 hover:scale-[1.02] hover:bg-slate-800 dark:hover:bg-emerald-600 hover:shadow-emerald-500/20">
+                        <button @click="cocinarYDescontar" class="flex-1 bg-slate-900 dark:bg-emerald-vibrant text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-[0.98] hover:scale-105 hover:bg-slate-800 dark:hover:bg-emerald-600 dark:hover:shadow-emerald-500/20">
                             Cocinar de Nuevo
                         </button>
                         

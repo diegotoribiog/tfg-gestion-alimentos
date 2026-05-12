@@ -91,7 +91,7 @@ const form = useForm({
             </div>
 
             <div class="flex items-center gap-6 pt-4">
-                <PrimaryButton :disabled="form.processing" class="rounded-2xl px-12 py-6 bg-emerald-500 font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-emerald-100 dark:shadow-none transition-all hover:scale-105 active:scale-95">Guardar Cambios</PrimaryButton>
+                <PrimaryButton :disabled="form.processing" class="rounded-2xl px-12 py-6 bg-emerald-500 font-black text-[11px] uppercase tracking-widest shadow-2xl dark:shadow-none transition-all hover:scale-105 active:scale-95">Guardar Cambios</PrimaryButton>
 
                 <Transition
                     enter-active-class="transition ease-in-out"

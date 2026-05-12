@@ -67,7 +67,7 @@ const pasos = [
 
             <!-- BOTÓN DE ACCIÓN -->
             <div class="flex justify-center pt-8">
-                <Link :href="route('alimentos.index')" class="bg-emerald-vibrant hover:bg-emerald-600 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95">
+                <Link :href="route('alimentos.index')" class="bg-emerald-vibrant hover:bg-emerald-600 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl dark:shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95">
                     Empezar a Organizar
                 </Link>
             </div>

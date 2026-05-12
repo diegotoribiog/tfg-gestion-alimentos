@@ -382,7 +382,7 @@ const getStatusCaducidad = (fecha) => {
             <section class="bg-white dark:bg-midnight-card backdrop-blur-md rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-700/50">
                 <button @click="mostrarPanelAdd = !mostrarPanelAdd" class="w-full flex items-center justify-between p-8">
                     <div class="flex items-center gap-4">
-                        <div class="p-3 bg-emerald-vibrant rounded-2xl text-white shadow-lg shadow-emerald-500/20 dark:shadow-none">
+                        <div class="p-3 bg-emerald-vibrant rounded-2xl text-white shadow-lg dark:shadow-none">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                         </div>
                         <h2 class="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Añadir a la Despensa</h2>
@@ -404,7 +404,7 @@ const getStatusCaducidad = (fecha) => {
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                            <button v-for="cat in categoriasCatalogo" :key="cat" @click="categoriaFiltro = (categoriaFiltro === cat ? null : cat)" :class="[categoriaFiltro === cat ? 'bg-emerald-vibrant text-white shadow-xl shadow-emerald-500/20 dark:shadow-none scale-105' : 'bg-white dark:bg-midnight/60 text-slate-400 dark:text-slate-500 hover:text-emerald-vibrant border border-slate-200/60 dark:border-slate-800/50']" class="w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center text-center px-2">{{ cat }}</button>
+                            <button v-for="cat in categoriasCatalogo" :key="cat" @click="categoriaFiltro = (categoriaFiltro === cat ? null : cat)" :class="[categoriaFiltro === cat ? 'bg-emerald-vibrant text-white shadow-xl dark:shadow-none scale-105' : 'bg-white dark:bg-midnight/60 text-slate-400 dark:text-slate-500 hover:text-emerald-vibrant border border-slate-200/60 dark:border-slate-800/50']" class="w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center text-center px-2">{{ cat }}</button>
                         </div>
 
                         <div class="min-h-48">
@@ -457,7 +457,6 @@ const getStatusCaducidad = (fecha) => {
                         <p class="text-[14px] font-bold text-slate-400 uppercase tracking-tight mt-1">Puedes seleccionar hasta 3 alimentos para generar una receta</p>
                     </div>
                     <div class="flex items-center gap-4">
-                        <button v-if="seleccionados.length > 0" @click="pregenerarReceta" :disabled="loadingReceta" class="text-[9px] font-black uppercase tracking-widest text-emerald-vibrant hover:text-emerald-600 transition-colors flex items-center gap-2"><svg v-if="!loadingReceta" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg><span v-else class="animate-spin w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full"></span>Generar Receta ({{ seleccionados.length }})</button>
                         <div class="relative w-full md:w-96">
                             <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></span>
                             <input v-model="busqueda" type="text" placeholder="¿Qué buscas hoy?" class="pl-10 w-full bg-slate-50/50 dark:bg-midnight/30 border border-slate-200 dark:border-slate-700 rounded-2xl py-3.5 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-emerald-vibrant/20 dark:text-white dark:placeholder-slate-700" />
@@ -502,7 +501,7 @@ const getStatusCaducidad = (fecha) => {
                                                 title="Seleccionar para receta"
                                                 :class="[
                                                     seleccionados.includes(a.id) 
-                                                        ? 'bg-emerald-vibrant text-white border-emerald-vibrant shadow-lg shadow-emerald-500/20' 
+                                                        ? 'bg-emerald-vibrant text-white border-emerald-vibrant shadow-lg' 
                                                         : 'bg-slate-50 dark:bg-midnight/50 text-slate-400 border-slate-100 dark:border-slate-800 hover:border-emerald-vibrant dark:hover:border-emerald-vibrant hover:text-emerald-vibrant'
                                                 ]" 
                                                 class="w-12 h-12 flex items-center justify-center rounded-xl border transition-all"
@@ -559,7 +558,7 @@ const getStatusCaducidad = (fecha) => {
             <!-- BOTÓN FLOTANTE: GENERAR RECETA -->
             <Transition enter-active-class="transition ease-out duration-300" enter-from-class="transform translate-y-20 opacity-0" enter-to-class="transform translate-y-0 opacity-100" leave-active-class="transition ease-in duration-200" leave-from-class="transform translate-y-0 opacity-100" leave-to-class="transform translate-y-20 opacity-0">
                 <div v-if="seleccionados.length > 0" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
-                    <button @click="pregenerarReceta" :disabled="loadingReceta" class="bg-emerald-vibrant text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-2xl shadow-emerald-500/40 hover:scale-105 active:scale-95 transition-all flex items-center gap-4 group">
+                    <button @click="pregenerarReceta" :disabled="loadingReceta" class="bg-emerald-vibrant text-white px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4 group">
                         <svg v-if="!loadingReceta" class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         <span v-else class="animate-spin w-5 h-5 border-2 border-current border-t-transparent rounded-full"></span>
                         <span>{{ loadingReceta ? 'Cocinando...' : `Generar Receta (${seleccionados.length})` }}</span>
@@ -650,7 +649,7 @@ const getStatusCaducidad = (fecha) => {
                         </button>
 
                         <!-- BOTÓN COCINAR AHORA -->
-                        <button @click="cocinarYDescontar" class="flex-1 bg-slate-900 dark:bg-emerald-vibrant text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 hover:scale-110 hover:bg-slate-800 dark:hover:bg-emerald-600 hover:shadow-emerald-500/20">
+                        <button @click="cocinarYDescontar" class="flex-1 bg-slate-900 dark:bg-emerald-vibrant text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl transition-all active:scale-95 hover:scale-110 hover:bg-slate-800 dark:hover:bg-emerald-600 dark:hover:shadow-emerald-500/20">
                             Cocinar Ahora
                         </button>
                     </div>

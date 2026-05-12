@@ -145,9 +145,11 @@ class RecetaController extends Controller
                                 REGLAS DE ORO:
                                 1. LOS INGREDIENTES SELECCIONADOS SON MANDATORIOS.
                                 2. CONDIMENTOS LIBRES: Tienes permiso total para usar aceite, sal, especias, vinagre y salsas básicas aunque no estén en el inventario. Inclúyelos en 'ingredientes_usados' con id: null y es_basico: true.
-                                3. Usa entre 3 y 6 ingredientes del inventario total proporcionado (además de los condimentos).
+                                3. Usa preferiblemente entre 3 y 6 ingredientes del inventario total proporcionado (además de los condimentos), pero si el inventario tiene menos de 3, usa lo que haya disponible.
                                 4. No mezcles proteínas pesadas (carne/pescado).
                                 5. No mezcles sabores incompatibles.
+                                6. NUNCA uses más cantidad de la que hay disponible en el inventario para un ingrediente.
+                                7. RESTRICCIÓN DE STOCK: Está terminantemente PROHIBIDO inventar ingredientes en 'ingredientes_usados'. Solo puedes incluir ingredientes que aparezcan explícitamente en el contexto [{$contextoIngredientes}] o condimentos básicos. Cualquier otro ingrediente necesario debe ir en 'ingredientes_extras'.
                                 
                                 REGLAS TÉCNICAS:
                                 - Unidades: GR, ML, UD (siempre enteros).

@@ -1,5 +1,6 @@
 <script setup>
 import { Head, useForm, Link } from '@inertiajs/vue3';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -21,8 +22,13 @@ const submit = () => {
 <template>
     <Head title="Recuperar acceso" />
 
-    <div class="relative flex min-h-screen bg-white">
+    <div class="relative flex min-h-screen bg-white dark:bg-midnight transition-colors duration-500">
         
+        <!-- Botón de Modo Oscuro -->
+        <div class="fixed top-5 right-5 z-50">
+            <ThemeToggle />
+        </div>
+
         <div class="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
             <img 
                 src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
@@ -40,31 +46,31 @@ const submit = () => {
             </div>
         </div>
 
-        <div class="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-24 bg-gray-50">
+        <div class="w-full lg:w-1/2 flex flex-col justify-center px-8 md:px-24 bg-gray-50 dark:bg-midnight transition-colors duration-500">
             <div class="max-w-md w-full mx-auto">
                 
                 <div class="lg:hidden mb-12 text-center">
-                    <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
+                    <h2 class="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">mi<span class="text-emerald-500">despensa</span></h2>
                 </div>
 
                 <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 text-center lg:text-left">Recuperar acceso</h2>
-                    <p class="mt-4 text-sm text-gray-600 leading-relaxed text-center lg:text-left">
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white text-center lg:text-left">Recuperar acceso</h2>
+                    <p class="mt-4 text-sm text-gray-600 dark:text-slate-400 leading-relaxed text-center lg:text-left">
                         Introduce tu correo electrónico y te enviaremos un enlace seguro para restablecer tu contraseña y volver a midespensa.
                     </p>
                 </div>
 
-                <div v-if="status" class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-100 font-medium text-sm text-emerald-700 shadow-sm">
+                <div v-if="status" class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 font-medium text-sm text-emerald-700 dark:text-emerald-400 shadow-sm">
                     {{ status }}
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <div>
-                        <InputLabel for="email" value="Correo electrónico" class="text-gray-600 ml-1" />
+                        <InputLabel for="email" value="Correo electrónico" class="text-gray-600 dark:text-slate-400 ml-1" />
                         <TextInput
                             id="email"
                             type="email"
-                            class="mt-1 block w-full bg-white"
+                            class="mt-1 block w-full bg-white dark:bg-midnight/50 border-gray-200 dark:border-slate-700"
                             v-model="form.email"
                             required
                             autofocus
@@ -75,20 +81,20 @@ const submit = () => {
 
                     <div class="flex flex-col gap-4 pt-2">
                         <PrimaryButton
-                            class="w-full justify-center bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold transition-all transform active:scale-[0.98] shadow-lg shadow-emerald-200 uppercase tracking-widest"
+                            class="w-full justify-center bg-emerald-600 dark:bg-emerald-vibrant hover:bg-emerald-700 dark:hover:bg-emerald-600 text-white py-4 rounded-xl font-bold transition-all transform active:scale-[0.98] shadow-lg dark:shadow-none uppercase tracking-widest"
                             :class="{ 'opacity-25': form.processing }"
                             :disabled="form.processing"
                         >
                             Enviar enlace de recuperación
                         </PrimaryButton>
 
-                        <Link :href="route('login')" class="text-center text-sm text-gray-400 hover:text-gray-600 transition font-medium">
+                        <Link :href="route('login')" class="text-center text-sm text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition font-medium">
                             Volver al inicio de sesión
                         </Link>
                     </div>
                 </form>
 
-                <div class="mt-16 text-center text-[10px] text-gray-400 uppercase tracking-widest font-semibold">
+                <div class="mt-16 text-center text-[10px] text-gray-400 dark:text-slate-600 uppercase tracking-widest font-semibold">
                     © 2026 midespensa · Gestión Inteligente de Alimentos
                 </div>
             </div>
