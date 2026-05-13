@@ -17,7 +17,7 @@ class StoreAlimentoRequest extends FormRequest
     {
         return [
             'nombre' => ['required', 'string', 'max:255'],
-            'cantidad' => ['required', 'numeric', 'min:0'],
+            'cantidad' => ['required', 'numeric', 'gt:0'],
             'unidad' => ['required', 'string', 'in:UD,GR,ML'],
             'fecha_caducidad' => ['required', 'date'],
             'notas' => ['nullable', 'string'],

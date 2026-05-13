@@ -47,8 +47,8 @@ const showAlert = (title, message, type = 'info') => {
     showAlertModal.value = true;
 };
 
-const showConfirm = (title, message, onConfirm) => {
-    confirmConfig.value = { title, message, onConfirm };
+const showConfirm = (title, message, onConfirm, type = 'danger') => {
+    confirmConfig.value = { title, message, onConfirm, type };
     showConfirmModal.value = true;
 };
 
@@ -134,11 +134,24 @@ const porcentajes = computed(() => {
 const getRelativo = (fecha) => {
     const hoy = new Date().setHours(0,0,0,0);
     const cad = new Date(fecha).setHours(0,0,0,0);
-    const dif = Math.round((cad - hoy) / 86400000);
-    if (dif < 0) return "Producto caducado";
+    const dif = Math.ceil((cad - hoy) / 86400000);
+
+    if (dif < 0) {
+        const absDif = Math.abs(dif);
+        return `Caducó hace ${absDif} ${absDif === 1 ? 'día' : 'días'}`;
+    }
     if (dif === 0) return "Caduca hoy";
     if (dif === 1) return "Caduca en 1 día";
     return `Caduca en ${dif} días`;
+};
+const getStatusColor = (fecha) => {
+    const hoy = new Date().setHours(0,0,0,0);
+    const cad = new Date(fecha).setHours(0,0,0,0);
+    const dif = Math.ceil((cad - hoy) / 86400000);
+    
+    if (dif < 0) return { text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500' };
+    if (dif <= 4) return { text: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-400' };
+    return { text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-vibrant' };
 };
 
 const eliminar = (id) => {
@@ -158,7 +171,7 @@ const eliminar = (id) => {
             
             <!-- FILA 1: MÉTRICAS COMPACTAS -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <Link :href="route('alimentos.index')" class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group dark:hover:border-emerald-vibrant/50 transition-all">
+                <Link :href="route('alimentos.index')" class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group transition-all">
                     <div class="bg-emerald-vibrant/10 text-emerald-vibrant w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl shadow-inner group-hover:scale-110 transition-transform">
                         {{ total }}
                     </div>
@@ -168,7 +181,7 @@ const eliminar = (id) => {
                     </div>
                 </Link>
 
-                <Link :href="route('alimentos.index')" class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group dark:hover:border-rose-500/50 transition-all">
+                <Link :href="route('alimentos.index')" class="bg-white dark:bg-midnight-card p-6 rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 flex items-center gap-6 shadow-sm group transition-all">
                     <div class="bg-rose-500/10 text-rose-600 dark:text-rose-400 w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl shadow-inner group-hover:scale-110 transition-transform">
                         {{ alertaCaducidad }}
                     </div>
@@ -200,11 +213,49 @@ const eliminar = (id) => {
                             <!-- Gráfico Circular -->
                             <div class="relative w-56 h-56 flex items-center justify-center flex-shrink-0">
                                 <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="40" fill="none" class="stroke-slate-50 dark:stroke-slate-800/50" stroke-width="12" />
+                                    <!-- Fondo Gris Base -->
+                                    <circle cx="50" cy="50" r="40" fill="none" class="stroke-slate-200 dark:stroke-slate-800/50" stroke-width="12" />
+                                    
                                     <g v-if="total > 0">
-                                        <circle v-if="porcentajes.caducado > 0" cx="50" cy="50" r="40" fill="none" class="stroke-rose-500" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${(porcentajes.caducado || 0) * 2.51} 251.2`" pathLength="251.2" />
-                                        <circle v-if="porcentajes.proximo > 0" cx="50" cy="50" r="40" fill="none" class="stroke-orange-400" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${(porcentajes.proximo || 0) * 2.51} 251.2`" :stroke-dashoffset="`-${(porcentajes.caducado || 0) * 2.51}`" pathLength="251.2" />
-                                        <circle v-if="porcentajes.bueno > 0" cx="50" cy="50" r="40" fill="none" class="stroke-emerald-vibrant" stroke-width="12" stroke-linecap="round" :stroke-dasharray="`${(porcentajes.bueno || 0) * 2.51} 251.2`" :stroke-dashoffset="`-${((porcentajes.caducado || 0) + (porcentajes.proximo || 0)) * 2.51}`" pathLength="251.2" />
+                                        <!-- VERDE (En Fecha) - Rotamos el círculo para que crezca hacia la IZQUIERDA -->
+                                        <circle 
+                                            v-if="porcentajes.bueno > 0" 
+                                            cx="50" 
+                                            cy="50" 
+                                            r="40" 
+                                            fill="none" 
+                                            class="stroke-emerald-500" 
+                                            stroke-width="12" 
+                                            :stroke-dasharray="`${(porcentajes.bueno * 251.2) / 100} 251.2`" 
+                                            stroke-dashoffset="0" 
+                                            :style="{ transform: `rotate(${-porcentajes.bueno * 3.6}deg)`, transformOrigin: '50% 50%' }"
+                                        />
+                                        
+                                        <!-- ROJO (Caducado) - Crece hacia la DERECHA -->
+                                        <circle 
+                                            v-if="porcentajes.caducado > 0" 
+                                            cx="50" 
+                                            cy="50" 
+                                            r="40" 
+                                            fill="none" 
+                                            class="stroke-rose-500" 
+                                            stroke-width="12" 
+                                            :stroke-dasharray="`${(porcentajes.caducado * 251.2) / 100} 251.2`" 
+                                            stroke-dashoffset="0" 
+                                        />
+                                        
+                                        <!-- NARANJA (Próximo) - Continúa después del rojo -->
+                                        <circle 
+                                            v-if="porcentajes.proximo > 0" 
+                                            cx="50" 
+                                            cy="50" 
+                                            r="40" 
+                                            fill="none" 
+                                            class="stroke-orange-400" 
+                                            stroke-width="12" 
+                                            :stroke-dasharray="`${(porcentajes.proximo * 251.2) / 100} 251.2`" 
+                                            :stroke-dashoffset="`-${(porcentajes.caducado * 251.2) / 100}`" 
+                                        />
                                     </g>
                                 </svg>
                                 <div class="absolute flex flex-col items-center">
@@ -236,19 +287,19 @@ const eliminar = (id) => {
                 <div class="bg-white dark:bg-midnight-card p-10 md:p-12 rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-700/50 flex flex-col h-[490px]">
                     <h3 class="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.5em] mb-12 text-center">Consumo Prioritario</h3>
                     
-                    <div v-if="productosUrgentes.length > 0" class="space-y-4 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+                    <div v-if="productosUrgentes.length > 0" class="space-y-4 overflow-y-auto flex-1 pr-1 scrollbar-hide">
                         <div v-for="a in productosUrgentes" :key="a.id" class="p-6 rounded-[2rem] bg-slate-50/50 dark:bg-midnight/30 border border-slate-100 dark:border-slate-800/50 hover:bg-white dark:hover:bg-midnight transition-all flex items-center justify-between group">
                             <div class="min-w-0 flex-1">
                                 <h4 class="font-black text-slate-900 dark:text-slate-100 uppercase text-xs tracking-tight mb-2 truncate group-hover:text-emerald-vibrant transition-colors">{{ a.nombre }}</h4>
                                 <div class="flex items-center gap-2">
-                                    <span :class="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ? 'bg-rose-500' : 'bg-orange-400'" class="w-2 h-2 rounded-full"></span>
-                                    <p class="text-[11px] tracking-widest uppercase font-black" :class="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ? 'text-rose-600' : 'text-orange-500'">{{ getRelativo(a.fecha_caducidad) }}</p>
+                                    <span :class="getStatusColor(a.fecha_caducidad).bg" class="w-2 h-2 rounded-full"></span>
+                                    <p class="text-[11px] tracking-widest uppercase font-black" :class="getStatusColor(a.fecha_caducidad).text">{{ getRelativo(a.fecha_caducidad) }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 ml-4">
                                 <button 
                                     v-if="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)"
-                                    @click="eliminar(a.id)" 
+                                    @click="eliminar(a.id)"
                                     class="opacity-0 group-hover:opacity-100 p-3 rounded-xl bg-white dark:bg-slate-700 text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100 dark:border-slate-600"
                                 >
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>

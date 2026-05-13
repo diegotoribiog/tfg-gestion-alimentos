@@ -18,7 +18,7 @@ class UpdateAlimentoRequest extends FormRequest
     {
         return [
             'nombre' => ['sometimes', 'required', 'string', 'max:255'],
-            'cantidad' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'cantidad' => ['sometimes', 'required', 'numeric', 'gt:0'],
             'unidad' => ['sometimes', 'required', 'string', 'in:UD,GR,ML'],
             'fecha_caducidad' => ['sometimes', 'required', 'date'],
             'notas' => ['nullable', 'string'],

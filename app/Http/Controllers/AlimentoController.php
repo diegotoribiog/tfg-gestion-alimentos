@@ -27,7 +27,7 @@ class AlimentoController extends Controller
         // El usuario_id se asigna automáticamente a través de la relación
         auth()->user()->alimentos()->create($request->validated());
 
-        return redirect()->back()->with('message', 'Alimento guardado correctamente');
+        return redirect()->back()->with('success', 'Alimento guardado correctamente');
     }
 
     // Actualiza un alimento existente con validación y seguridad
@@ -35,7 +35,7 @@ class AlimentoController extends Controller
     {
         $alimento->update($request->validated());
 
-        return redirect()->back()->with('message', 'Alimento actualizado');
+        return redirect()->back()->with('success', 'Alimento actualizado');
     }
 
     // Elimina un alimento si pertenece al usuario
@@ -47,7 +47,7 @@ class AlimentoController extends Controller
 
         $alimento->delete();
 
-        return redirect()->back()->with('message', 'Alimento eliminado');
+        return redirect()->back()->with('success', 'Alimento eliminado');
     }
 
     // Elimina todos los alimentos caducados del usuario
@@ -57,7 +57,7 @@ class AlimentoController extends Controller
             ->where('fecha_caducidad', '<', now()->toDateString())
             ->delete();
 
-        return redirect()->back()->with('message', "Se han eliminado {$eliminados} productos caducados");
+        return redirect()->back()->with('success', "Se han eliminado {$eliminados} productos caducados");
     }
 
     // Lógica para ajustar stock (sumar o restar cantidad)
@@ -75,11 +75,11 @@ class AlimentoController extends Controller
 
         if ($nuevaCantidad <= 0) {
             $alimento->delete();
-            return redirect()->back()->with('message', 'Producto agotado y eliminado del inventario');
+            return redirect()->back()->with('success', 'Producto agotado y eliminado del inventario');
         }
 
         $alimento->update(['cantidad' => $nuevaCantidad]);
 
-        return redirect()->back()->with('message', 'Stock actualizado correctamente');
+        return redirect()->back()->with('success', 'Stock actualizado correctamente');
     }
 }

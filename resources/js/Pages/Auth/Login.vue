@@ -53,7 +53,7 @@ const submit = () => {
                 </h1>
                 <p class="text-xl text-gray-300 max-w-md leading-relaxed mb-10">
                     Gestiona tu inventario de comida de forma inteligente. 
-                    Evita el desperdicio, ahorra dinero y ten siempre el control.
+                    Prioriza lo que caduca pronto, genera recetas fáciles y cocina sin complicaciones.
                 </p>
                 
                 <div class="flex items-center gap-12 bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10">

@@ -8,6 +8,7 @@ import InputError from "@/Components/InputError.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Modal from "@/Components/Modal.vue";
+import SelectInput from "@/Components/SelectInput.vue";
 import ModalConfirm from "@/Components/ModalConfirm.vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import Checkbox from "@/Components/Checkbox.vue";
@@ -326,6 +327,11 @@ const submit = () => {
             // Volvemos a desplazar la vista a selección rápida
             seleccionRapidaSection.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         },
+        onError: (errors) => {
+            // Si hay errores, podemos mostrar una alerta general o dejar que InputError haga su trabajo
+            const primerError = Object.values(errors)[0];
+            router.page.props.flash.error = primerError || "Corrige los errores del formulario";
+        },
         preserveScroll: true 
     });
 };
@@ -348,7 +354,14 @@ const ajustarForm = useForm({ cantidad: 0 });
 const abrirAjuste = (alimento) => { alimentoParaAjustar.value = alimento; ajustarForm.cantidad = 0; };
 const confirmarAjuste = () => {
     ajustarForm.post(route("alimentos.ajustarStock", alimentoParaAjustar.value.id), {
-        onSuccess: () => { alimentoParaAjustar.value = null; ajustarForm.reset(); },
+        onSuccess: () => { 
+            alimentoParaAjustar.value = null; 
+            ajustarForm.reset(); 
+        },
+        onError: (errors) => {
+            const primerError = Object.values(errors)[0];
+            router.page.props.flash.error = primerError || "No se pudo actualizar el stock";
+        },
         preserveScroll: true
     });
 };
@@ -357,6 +370,8 @@ const getStatusCaducidad = (fecha) => {
     const hoy = new Date().setHours(0,0,0,0);
     const cad = new Date(fecha).setHours(0,0,0,0);
     const dif = Math.ceil((cad - hoy) / 86400000);
+    
+    // ROJO: Menos de 0 días (Ya caducado)
     if (dif < 0) {
         const dias = Math.abs(dif);
         return { 
@@ -365,10 +380,22 @@ const getStatusCaducidad = (fecha) => {
             dot: 'bg-rose-500' 
         };
     }
-    if (dif === 0) return { label: 'Hoy', class: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30', dot: 'bg-orange-500' };
-    if (dif === 1) return { label: 'En 1 día', class: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30', dot: 'bg-orange-500' };
-    if (dif <= 3) return { label: `En ${dif} días`, class: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30', dot: 'bg-orange-500' };
-    return { label: `Faltan ${dif} días`, class: 'bg-emerald-vibrant/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30', dot: 'bg-emerald-vibrant' };
+    
+    // NARANJA: de 0 a 4 días (Incluye hoy)
+    if (dif <= 4) {
+        return { 
+            label: dif === 0 ? 'Hoy' : `En ${dif} ${dif === 1 ? 'día' : 'días'}`, 
+            class: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30', 
+            dot: 'bg-orange-500' 
+        };
+    }
+    
+    // VERDE: 5 días o más
+    return { 
+        label: `Faltan ${dif} días`, 
+        class: 'bg-emerald-vibrant/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30', 
+        dot: 'bg-emerald-vibrant' 
+    };
 };
 </script>
 
@@ -399,7 +426,7 @@ const getStatusCaducidad = (fecha) => {
                             </div>
                             <div class="relative w-full md:w-80">
                                 <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></span>
-                                <input v-model="busquedaCatalogo" type="text" placeholder="Buscar en catálogo..." class="w-full bg-white dark:bg-midnight/60 border border-slate-100 dark:border-slate-800/50 rounded-2xl py-3.5 pl-10 pr-4 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-emerald-vibrant/20 shadow-sm dark:text-white dark:placeholder-slate-700" />
+                                <input v-model="busquedaCatalogo" type="text" placeholder="Buscar en catálogo..." class="w-full bg-white dark:bg-midnight/60 border border-slate-200 dark:border-slate-700 rounded-2xl py-3.5 pl-10 pr-4 text-xs font-black uppercase tracking-widest focus:border-emerald-vibrant focus:ring-2 focus:ring-emerald-vibrant/20 shadow-sm dark:text-white dark:placeholder-slate-700 transition-all" />
                             </div>
                         </div>
 
@@ -431,15 +458,16 @@ const getStatusCaducidad = (fecha) => {
                                 <InputLabel value="Cantidad" class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2" />
                                 <div class="flex gap-2">
                                     <TextInput v-model="form.cantidad" type="number" step="1" class="w-full h-[44px] text-[10px] font-black uppercase tracking-widest px-4" required />
-                                    <select v-model="form.unidad" class="border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-midnight/50 rounded-2xl text-[10px] font-black uppercase tracking-widest pl-4 pr-10 dark:text-slate-300 h-[44px]"><option value="UD">UD</option><option value="GR">GR</option><option value="ML">ML</option></select>
+                                    <SelectInput v-model="form.unidad" :options="['UD', 'GR', 'ML']" class="w-32" />
                                 </div>
                             </div>
-                            <div>
-                                <InputLabel value="Fecha de Caducidad" class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2" /><DatePicker v-model="form.fecha_caducidad" />
+                            <div class="flex flex-col">
+                                <InputLabel value="Fecha de Caducidad" class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2" />
+                                <DatePicker v-model="form.fecha_caducidad" />
                             </div>
                             <div class="md:col-span-2">
                                 <InputLabel value="Categoría" class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2" />
-                                <select v-model="form.categoria_id" class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-midnight/50 rounded-2xl text-[10px] font-black uppercase tracking-widest h-[44px] pl-4 pr-10 dark:text-slate-300" required><option value="" disabled>Seleccionar...</option><option v-for="c in categorias" :key="c.id" :value="c.id">{{ c.nombre }}</option></select>
+                                <SelectInput v-model="form.categoria_id" :options="categorias" label-key="nombre" value-key="id" placeholder="Seleccionar..." />
                             </div>
                             <div class="flex items-end md:col-start-4">
                                 <PrimaryButton class="w-full justify-center py-3.5 bg-slate-900 dark:bg-emerald-vibrant text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl" :disabled="form.processing">Añadir a Despensa</PrimaryButton>
@@ -459,7 +487,7 @@ const getStatusCaducidad = (fecha) => {
                     <div class="flex items-center gap-4">
                         <div class="relative w-full md:w-96">
                             <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></span>
-                            <input v-model="busqueda" type="text" placeholder="¿Qué buscas hoy?" class="pl-10 w-full bg-slate-50/50 dark:bg-midnight/30 border border-slate-200 dark:border-slate-700 rounded-2xl py-3.5 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-emerald-vibrant/20 dark:text-white dark:placeholder-slate-700" />
+                            <input v-model="busqueda" type="text" placeholder="¿Qué buscas hoy?" class="pl-10 w-full bg-slate-50/50 dark:bg-midnight/30 border border-slate-200 dark:border-slate-700 rounded-2xl py-3.5 text-xs font-black uppercase tracking-widest focus:border-emerald-vibrant focus:ring-2 focus:ring-emerald-vibrant/20 dark:text-white dark:placeholder-slate-700 transition-all" />
                         </div>
                     </div>
                 </div>
@@ -544,7 +572,7 @@ const getStatusCaducidad = (fecha) => {
 
                                             <div class="">
                                                 <div class="flex items-center justify-between mb-4"><p class="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-[0.4em]">Notas y Descripción</p><button @click="guardarNotas(a.id)" :disabled="notasForm.processing" class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-vibrant hover:scale-105 transition-all flex items-center gap-2">{{ notasForm.recentlySuccessful ? 'Guardado' : 'Guardar Notas' }}</button></div>                                            
-                                                <textarea v-model="notasForm.notas" class="w-full border border-slate-100 dark:border-slate-800 bg-white dark:bg-midnight/60 rounded-[1.5rem] text-sm font-medium p-6 focus:ring-2 focus:ring-emerald-vibrant/10 shadow-sm dark:text-slate-400 dark:placeholder-slate-800" rows="3" placeholder="Añade detalles del producto..."></textarea>
+                                                <textarea v-model="notasForm.notas" class="w-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-midnight/60 rounded-[1.5rem] text-sm font-medium p-6 focus:border-emerald-vibrant focus:ring-2 focus:ring-emerald-vibrant/10 shadow-sm dark:text-slate-400 dark:placeholder-slate-800 transition-all" rows="3" placeholder="Añade detalles del producto..."></textarea>
                                             </div>
                                         </div>
                                     </td>
@@ -672,10 +700,6 @@ const getStatusCaducidad = (fecha) => {
 </template>
 
 <style scoped>
-.custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; }
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
 </style>

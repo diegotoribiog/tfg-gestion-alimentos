@@ -10,14 +10,30 @@ import { Link, usePage } from "@inertiajs/vue3";
 const showingNavigationDropdown = ref(false);
 const page = usePage();
 const toast = ref(null);
+const toastType = ref('success');
 
-// Sistema de notificaciones minimalista
-watch(() => page.props.message, (newMessage) => {
-    if (newMessage) {
-        toast.value = newMessage;
-        setTimeout(() => toast.value = null, 3000);
+// Sistema de notificaciones mejorado para capturar errores de validación y mensajes flash
+watch(() => [page.props.flash, page.props.errors], ([flash, errors]) => {
+    // Prioridad 1: Mensajes flash de éxito
+    if (flash?.success) {
+        toast.value = flash.success;
+        toastType.value = 'success';
+        setTimeout(() => { toast.value = null; flash.success = null; }, 4000);
+    } 
+    // Prioridad 2: Mensajes flash de error explícitos
+    else if (flash?.error) {
+        toast.value = flash.error;
+        toastType.value = 'error';
+        setTimeout(() => { toast.value = null; flash.error = null; }, 5000);
     }
-}, { immediate: true });
+    // Prioridad 3: Errores de validación automáticos de Laravel
+    else if (Object.keys(errors || {}).length > 0) {
+        toast.value = Object.values(errors)[0];
+        toastType.value = 'error';
+        // No limpiamos errors manualmente para que InputError pueda mostrarlos
+        setTimeout(() => { toast.value = null; }, 5000);
+    }
+}, { immediate: true, deep: true });
 
 // Soporte para modo oscuro
 const isDark = ref(false);
@@ -41,15 +57,16 @@ onMounted(() => {
         <!-- Notificación Toast -->
         <Transition
             enter-active-class="transform ease-out duration-300 transition"
-            enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+            enter-from-class="translate-y-[-20px] opacity-0 sm:translate-y-0 sm:translate-x-2"
             enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
             leave-active-class="transition ease-in duration-100"
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
         >
-            <div v-if="toast" class="fixed bottom-5 right-5 z-[100] max-w-sm w-full bg-white dark:bg-midnight-card/90 backdrop-blur-md shadow-2xl rounded-2xl border border-slate-200/60 dark:border-slate-700/50 p-4 flex items-center gap-3">
-                <div class="bg-emerald-vibrant/10 p-2 rounded-xl">
-                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <div v-if="toast" class="fixed top-20 right-5 z-[100] max-w-sm w-full bg-white dark:bg-midnight-card/90 backdrop-blur-md shadow-2xl rounded-2xl border border-slate-200/60 dark:border-slate-700/50 p-4 flex items-center gap-3">
+                <div :class="toastType === 'success' ? 'bg-emerald-vibrant/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'" class="p-2 rounded-xl">
+                    <svg v-if="toastType === 'success'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 </div>
                 <p class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ toast }}</p>
             </div>

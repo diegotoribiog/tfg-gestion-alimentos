@@ -152,7 +152,7 @@ class RecetaController extends Controller
                                 7. RESTRICCIÓN DE STOCK: Está terminantemente PROHIBIDO inventar ingredientes en 'ingredientes_usados'. Solo puedes incluir ingredientes que aparezcan explícitamente en el contexto [{$contextoIngredientes}] o condimentos básicos. Cualquier otro ingrediente necesario debe ir en 'ingredientes_extras'.
                                 
                                 REGLAS TÉCNICAS:
-                                - Unidades: GR, ML, UD (siempre enteros).
+                                - Unidades: GR, ML, UD (siempre enteros). PROHIBIDO realizar conversiones de unidades: Si un ingrediente está en 'GR' en el inventario, úsalo obligatoriamente en 'GR' en la receta. No cambies 'GR' o 'ML' por 'UD' ni viceversa.
                                 - Cantidades: NUNCA uses 0. Incluso para condimentos o básicos, pon una cantidad lógica para 1 persona (ej: 10 ML, 5 GR, 1 UD).
                                 - Ración: 1 Persona.
                                 - Si es imposible crear algo coherente, el título debe ser 'ERROR_GASTRONOMICO'.

@@ -59,7 +59,7 @@ const confirm = () => {
             <slot name="additional-content" />
 
             <div class="flex flex-col gap-3 mt-6">
-                <DangerButton v-if="type === 'danger' && !isAlert" @click="confirm" class="w-full justify-center py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-200 dark:shadow-none">
+                <DangerButton v-if="type === 'danger' && !isAlert" @click="confirm" class="w-full justify-center py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl dark:shadow-none">
                     {{ confirmText }}
                 </DangerButton>
                 <PrimaryButton v-else-if="!isAlert" @click="confirm" class="w-full justify-center py-4 bg-slate-900 dark:bg-emerald-vibrant text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-slate-200/50 dark:shadow-none">

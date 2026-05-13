@@ -184,7 +184,7 @@ onUnmounted(() => {
     <div class="w-full relative" ref="inputContainerRef">
         <!-- Input con Máscara y Guía Visual -->
         <div 
-            class="w-full h-[44px] bg-white dark:bg-midnight/50 rounded-2xl px-4 flex items-center justify-between border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-emerald-vibrant/20 transition-all shadow-sm group"
+            class="w-full h-[44px] bg-white dark:bg-midnight/50 rounded-2xl px-4 flex items-center justify-between border border-slate-200 dark:border-slate-700 focus-within:border-emerald-vibrant focus-within:ring-2 focus-within:ring-emerald-vibrant/20 transition-all shadow-sm group"
         >
             <div class="relative flex-1 h-full flex items-center">
                 <!-- Capa de Guía (DD/MM/YYYY) -->

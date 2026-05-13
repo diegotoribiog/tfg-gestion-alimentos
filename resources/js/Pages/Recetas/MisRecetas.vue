@@ -25,8 +25,8 @@ const showAlert = (title, message, type = 'info') => {
     showAlertModal.value = true;
 };
 
-const showConfirm = (title, message, onConfirm) => {
-    confirmConfig.value = { title, message, onConfirm };
+const showConfirm = (title, message, onConfirm, type = 'danger') => {
+    confirmConfig.value = { title, message, onConfirm, type };
     showConfirmModal.value = true;
 };
 
