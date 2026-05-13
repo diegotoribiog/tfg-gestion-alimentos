@@ -1,59 +1,54 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <br />
+  <h1 style="border-bottom: none;">
+    <span style="color: #000000;">mi</span><span style="color: #10b981;">despensa</span>
+  </h1>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+  <p align="center">
+    <strong>Gestión inteligente de alimentos para reducir el desperdicio y cocinar con creatividad.</strong>
+  </p>
 
-## About Laravel
+  <p align="center">
+    <img src="https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 11" />
+    <img src="https://img.shields.io/badge/Vue.js-3-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white" alt="Vue 3" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+    <img src="https://img.shields.io/badge/Inertia.js-Modern-9553E9?style=for-the-badge&logo=inertia&logoColor=white" alt="Inertia" />
+  </p>
+</div>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Sobre el Proyecto
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**midespensa** no es solo un inventario; es un asistente inteligente diseñado para transformar la forma en que interactúas con tu cocina. Centrado en el minimalismo y la eficiencia, este proyecto ayuda a los usuarios a tener un control total sobre su stock de alimentos, priorizando el consumo de lo que está cerca de caducar y sugiriendo recetas creativas mediante Inteligencia Artificial.
 
-## Learning Laravel
+### Características Principales
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Inventario Inteligente:** Gestión de stock con seguimiento preciso de fechas de caducidad.
+- **Consumo Prioritario:** Sistema de alertas visuales para productos que requieren atención inmediata.
+- **Recetas con IA:** Generación de propuestas gastronómicas basadas exclusivamente en lo que tienes disponible.
+- **Modo Oscuro Nativo:** Interfaz moderna y fluida que se adapta a tus preferencias.
+- **Métricas de Desperdicio:** Visualización clara del estado de tu despensa para optimizar tus compras.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Stack Tecnológico
 
-## Laravel Sponsors
+Este proyecto utiliza las tecnologías más robustas del ecosistema web moderno:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Backend:** [Laravel 11](https://laravel.com/) - El framework PHP para artesanos web.
+- **Frontend:** [Vue 3](https://vuejs.org/) (Composition API) - Reactividad y componentes modulares.
+- **Conector:** [Inertia.js](https://inertiajs.com/) - Construye aplicaciones single-page usando rutas y controladores clásicos de servidor.
+- **Estilos:** [Tailwind CSS](https://tailwindcss.com/) - Diseño minimalista y utilitario.
+- **Base de Datos:** MySQL.
 
-### Premium Partners
+### Filosofía de Diseño
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Inspirado en el minimalismo puro:
+- **Espacios negativos** para una lectura descansada.
+- **Bordes suaves** y sombras sutiles para una profundidad moderna.
+- **Jerarquía clara** que hace la navegación intuitiva y "obvia".
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<div align="center">
+  <p size="2">© 2026 midespensa · TFG Gestión de Alimentos Inteligente</p>
+</div>
