@@ -296,14 +296,28 @@ const eliminar = (id) => {
                                     <p class="text-[11px] tracking-widest uppercase font-black" :class="getStatusColor(a.fecha_caducidad).text">{{ getRelativo(a.fecha_caducidad) }}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 ml-4">
-                                <button 
-                                    v-if="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)"
-                                    @click="eliminar(a.id)"
-                                    class="opacity-0 group-hover:opacity-100 p-3 rounded-xl bg-white dark:bg-slate-700 text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100 dark:border-slate-600"
-                                >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
+                            <div class="flex items-center ml-4 relative overflow-hidden h-10 w-28 px-1">
+                                <div class="flex items-center gap-3 transition-all duration-300 ease-out transform w-full" 
+                                     :class="[
+                                         new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) 
+                                         ? 'group-hover:-translate-x-12' 
+                                         : ''
+                                     ]">
+                                    <div class="min-w-[100px] text-right">
+                                        <p class="text-sm font-black text-slate-900 dark:text-slate-100 leading-none">
+                                            {{ Number(a.cantidad) }}
+                                            <span class="text-[9px] opacity-40 uppercase tracking-widest ml-0.5">{{ a.unidad }}</span>
+                                        </p>
+                                    </div>
+                                    
+                                    <button 
+                                        v-if="new Date(a.fecha_caducidad).setHours(0,0,0,0) < new Date().setHours(0,0,0,0)"
+                                        @click="eliminar(a.id)"
+                                        class="absolute left-full ml-2 opacity-0 group-hover:opacity-100 p-2 rounded-xl bg-white dark:bg-slate-700 text-slate-400 hover:text-rose-500 transition-all shadow-sm border border-slate-100 dark:border-slate-600 z-10"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

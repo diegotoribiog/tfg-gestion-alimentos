@@ -269,7 +269,7 @@ onMounted(() => {
                         :active="route().current('recetas.index')"
                         class="dark:text-slate-300"
                     >
-                        Mis Recetas
+                        Recetas
                     </ResponsiveNavLink>
                 </div>
 

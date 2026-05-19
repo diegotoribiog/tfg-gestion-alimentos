@@ -32,8 +32,9 @@ const syncFromModel = () => {
             const date = new Date(y, m - 1, d);
             if (!isNaN(date)) viewDate.value = date;
         }
-    } else if (inputValue.value.length === 10) {
+    } else {
         inputValue.value = '';
+        viewDate.value = new Date();
     }
 };
 

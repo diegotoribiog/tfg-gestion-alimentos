@@ -103,7 +103,7 @@ const form = useForm({
                         v-if="form.recentlySuccessful"
                         class="text-[11px] font-black text-emerald-500 uppercase tracking-[0.2em]"
                     >
-                        // Datos guardados correctamente.
+                        Datos guardados correctamente.
                     </p>
                 </Transition>
             </div>

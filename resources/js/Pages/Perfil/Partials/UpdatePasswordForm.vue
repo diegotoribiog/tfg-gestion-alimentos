@@ -113,7 +113,7 @@ const updatePassword = () => {
                         v-if="form.recentlySuccessful"
                         class="text-[11px] font-black text-emerald-500 uppercase tracking-[0.2em]"
                     >
-                        // Seguridad actualizada.
+                        Seguridad actualizada.
                     </p>
                 </Transition>
             </div>

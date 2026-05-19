@@ -92,6 +92,8 @@ const generarRecetaSeleccionados = async () => {
         });
         recetaIA.value = response.data;
         showModalReceta.value = true;
+        // Desmarcamos los alimentos una vez generada la receta
+        seleccionados.value = [];
     } catch (e) {
         showAlert("Error", e.response?.data?.error || "Error al generar receta", "danger");
     } finally {
@@ -119,7 +121,6 @@ const cocinarYDescontar = async () => {
                 });
                 
                 showModalReceta.value = false;
-                seleccionados.value = [];
                 showAlert("¡Buen provecho!", "Stock actualizado correctamente.", "success");
                 router.reload({ preserveScroll: true });
             } catch (e) {

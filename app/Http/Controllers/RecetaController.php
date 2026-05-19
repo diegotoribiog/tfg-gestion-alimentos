@@ -143,9 +143,9 @@ class RecetaController extends Controller
                                 'content' => "INSTRUCCIÓN CRÍTICA: {$mensajeUsuario}
                                 
                                 REGLAS DE ORO:
-                                1. LOS INGREDIENTES SELECCIONADOS SON MANDATORIOS.
+                                1. LOS INGREDIENTES SELECCIONADOS SON MANDATORIOS, TIENES QUE UTILIZARLOS SI O SI.
                                 2. CONDIMENTOS LIBRES: Tienes permiso total para usar aceite, sal, especias, vinagre y salsas básicas aunque no estén en el inventario. Inclúyelos en 'ingredientes_usados' con id: null y es_basico: true.
-                                3. Usa preferiblemente entre 3 y 6 ingredientes del inventario total proporcionado (además de los condimentos), pero si el inventario tiene menos de 3, usa lo que haya disponible.
+                                3. Usa preferiblemente entre 3 y 8 ingredientes del inventario total proporcionado (además de los condimentos). Intenta que las recetas incluyan varios ingredientes del inventario y que por ejemplo al hacer ensaladas no sean muy simples (por ejemplo utiliza varias verduras como lechuga, pepino, tomates, etc).
                                 4. No mezcles proteínas pesadas (carne/pescado).
                                 5. No mezcles sabores incompatibles.
                                 6. NUNCA uses más cantidad de la que hay disponible en el inventario para un ingrediente.

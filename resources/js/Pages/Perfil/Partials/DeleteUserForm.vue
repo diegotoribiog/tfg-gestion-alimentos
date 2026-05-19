@@ -46,7 +46,7 @@ const closeModal = () => {
             </h2>
 
             <p class="mt-3 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] leading-relaxed">
-                Al eliminar tu cuenta, todos tus registros (alimentos, inventario y datos) se perderán para siempre.
+                Al eliminar tu cuenta, todos tus registros se perderán para siempre.
             </p>
         </header>
 

@@ -22,7 +22,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Crear cuenta - midespensa" />
+    <Head title="Crear cuenta" />
 
     <div class="relative flex min-h-screen bg-white dark:bg-midnight transition-colors duration-500">
         
